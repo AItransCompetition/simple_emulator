@@ -25,7 +25,7 @@ def cal_qoe(x=0.9):
         for line in f.readlines():
             data = json.loads(line.replace("'", '"'))
             # not finished
-            if data["Miss_ddl"] == 0 and data["Size"] - data["Finished_bytes"] <= 0.000001:
+            if data["Miss_ddl"] == 0 and data["Size"] - data["Finished_bytes"] > 0.000001:
                 continue
             block_data.append(data)
     for block in block_data:
@@ -35,6 +35,7 @@ def cal_qoe(x=0.9):
             urgency.append(1)
         else:
             urgency.append(0)
+            priorities[-1] *= 0
     for i in range(len(urgency)):
         qoe += x * priorities[i] + (1 - x) * urgency[i]
     return qoe

@@ -28,14 +28,6 @@ __all__ = ["Emulator", "CongestionControl", "PacketSelection", \
            "Reno", "create_2flow_emulator", "constant", \
            "cal_qoe"]
 
-block_file = parentdir+"/simple_emulator"+"/config/block.txt"
-trace_file = parentdir+"/simple_emulator"+"/config/trace.txt"
-log_file = "output/emulator.log"
-log_packet_file = "output/packet_log/packet-0.log"
-
-new_trace_file = parentdir+"/simple_emulator"+"scripts/first_group/traces_1.txt"
-new_block_files = [parentdir+"/simple_emulator"+"config/data_video.csv", parentdir+"/simple_emulator"+"config/data_audio.csv"]
-
 try:
     if os.path.exists("output"):
         if platform.system() == "Windows":
