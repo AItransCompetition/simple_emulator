@@ -8,8 +8,8 @@
 # @Time : 2020/4/10 15:52
 '''
 
-from objects.emulator import Emulator
-from utils import analyze_emulator, plot_cwnd, plot_rate
+from objects.emulator import PccEmulator
+from utils import analyze_pcc_emulator, plot_cwnd, plot_rate
 import os, sys, inspect, random
 from config.constant import *
 from objects.sender import Sender as WinSender
@@ -19,7 +19,7 @@ from objects.link import Link
 from player.examples.reno import Reno
 # from player.examples.simple_bbr import BBR
 from player.examples.match_trace_rate import MTR
-from player.packet_selection import Solution as PacketSelection
+from player.packet_selection import Solution as Packet_selection
 from objects.cc_base import CongestionControl
 
 
@@ -28,16 +28,16 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
 
-class RenoSolution(Reno, PacketSelection):
+class RenoSolution(Reno, Packet_selection):
     pass
 
 
-class NormalSolution(MTR, PacketSelection):
+class NormalSolution(MTR, Packet_selection):
     pass
 
 
 def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
-    emulator = Emulator(
+    emulator = PccEmulator(
         block_file=block_file,
         trace_file=trace_file,
         senders=[],
@@ -83,6 +83,6 @@ if __name__ == '__main__':
     print(emulator.senders[0].application.ack_blocks)
     from qoe_model import cal_qoe
     print(cal_qoe(0.9))
-    # analyze_emulator(log_packet_file, file_range="all")
+    # analyze_pcc_emulator(log_packet_file, file_range="all")
     # plot_cwnd(log_packet_file, trace_file=trace_file, file_range="all")
     # plot_throughput(log_packet_file, trace_file=trace_file, file_range="all")

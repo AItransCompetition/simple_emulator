@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from objects.emulator import Emulator
+from objects.emulator import PccEmulator
 import os, sys, inspect
 from config.constant import *
 import numpy as np

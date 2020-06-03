@@ -17,7 +17,7 @@ if "simple_emulator" not in parentdir:
     parentdir += "simple_emulator"
 
 
-class Emulator(object):
+class PccEmulator(object):
 
     def __init__(self,
                  block_file=None,
