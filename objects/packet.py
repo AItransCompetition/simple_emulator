@@ -30,6 +30,7 @@ class Packet(object):
         self.latency = latency
         self.extra = {}
         self.block_info = block_info
+        self.decision_order = 0
 
         if packet_id is None:
             self.packet_id = Packet._get_next_packet()
@@ -108,7 +109,7 @@ class Packet(object):
         return cur_time-self.block_info["Create_time"] > self.block_info["Deadline"]
 
     def __lt__(self, other):
-        return self.create_time < other.create_time
+        return self.decision_order < other.decision_order
 
     def __str__(self):
         print_data = self.trans2dict()

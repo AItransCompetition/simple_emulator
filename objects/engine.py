@@ -6,7 +6,8 @@ from config import constant
 
 class Engine():
 
-    def __init__(self, senders, links):
+    def __init__(self, senders, links, **kwargs):
+        self.update_config(kwargs)
         self.q = []
         self.cur_time = 0.0
         self.senders = senders
@@ -17,6 +18,9 @@ class Engine():
         self.log_packet_file = "output/packet_log/packet-0.log"
         self.log_items = 0
         self.last_alert_time = 0
+
+    def update_config(self, extra):
+        self.run_dir = extra["RUN_DIR"]+'/' if "RUN_DIR" in extra else ''
 
     def queue_initial_packets(self):
         """initial the packet queue in network"""
@@ -47,7 +51,7 @@ class Engine():
         while self.cur_time < end_time:
             if len(self.q) == 0:
                 print("Time {}s : There is no packet from application~".format(self.cur_time))
-                return
+                break
 
             event_time, sender, packet = heapq.heappop(self.q)
             self.log_packet(event_time, sender, packet)
@@ -73,15 +77,12 @@ class Engine():
                         # print("Packet lost at time %f" % self.cur_time)
                     else:
                         # may acked packet which is not in window after packet loss
-                        sender.on_packet_acked(packet.get_rtt(), packet)
-                        # print("Packet acked at time %f" % self.cur_time)
+                        sender.on_packet_acked(packet.get_rtt(), packet, event_time)
                     # for windows-based cc
                     if sender.USE_CWND:
                         # continue ack may use same inflight numbers which will be limited to cwnd but redundancy in log
                         for _packet in sender.slide_windows(self.cur_time, sender.in_event_nums):
                             sender.in_event_nums += 1
-                            # print("Now {}, packet id {}, create time {}".format(self.cur_time, _packet.packet_id, _packet.create_time))
-                            # print("wait for push set {}".format(set([item[2].create_time for item in sender.wait_for_push_packets])))
                             heapq.heappush(self.q, (max(self.cur_time+(1.0 / sender.rate), _packet.create_time), \
                                                 sender, _packet))
 
@@ -179,8 +180,8 @@ class Engine():
                 file_nums = self.log_items // constant.MAX_PACKET_LOG_ROWS
                 if self.log_items and self.log_items % constant.MAX_PACKET_LOG_ROWS == 0:
                     self.fir_log = True
-                return self.log_packet_file.replace('0', str(file_nums))
-            return self.log_packet_file
+                return self.run_dir + self.log_packet_file.replace('0', str(file_nums))
+            return self.run_dir + self.log_packet_file
 
         if constant.ENABLE_DEBUG and event_time - self.last_alert_time >= ALERT_CIRCLE:
             self.last_alert_time = event_time
@@ -241,4 +242,4 @@ class Engine():
         for sender in self.senders:
             debug_print("sender {} wait_for_push_packets size {}".format(sender.id, len(sender.wait_for_push_packets)))
             if sender.application:
-                sender.application.close()
+                sender.application.close(self.cur_time)

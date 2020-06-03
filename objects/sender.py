@@ -1,9 +1,10 @@
 from config.constant import *
 from common import sender_obs
 from utils import check_solution_format, measure_time
-from objects.application import Appication_Layer
+from objects.application import AppicationLayer
 from objects.packet import Packet
 from config import constant
+import heapq
 
 
 class Sender():
@@ -42,6 +43,8 @@ class Sender():
         # for player
         self.wait_for_select_packets = []
         self.in_event_nums = 0
+        # record packet's decision order
+        self.decision_order = 0
 
     _next_id = 1
 
@@ -53,7 +56,7 @@ class Sender():
 
     def init_application(self, block_file, **kwargs):
         """initial the sender's application which will send packet to it."""
-        self.application = Appication_Layer(block_file, bytes_per_packet=BYTES_PER_PACKET, **kwargs)
+        self.application = AppicationLayer(block_file, bytes_per_packet=BYTES_PER_PACKET, **kwargs)
 
     # @measure_time()
     def new_packet(self, cur_time, mode):
@@ -86,33 +89,28 @@ class Sender():
         """
         # Is it necessary ? Reduce system burden by delete the packets missing ddl in time
         # self.clear_miss_ddl(cur_time)
-        # import time
-        # st = time.time()
         while True:
             # if there is no packet can be sended, we need to send packet that created after cur_time
             packet = self.new_packet(cur_time, "force" if len(self.wait_for_select_packets) + len(self.wait_for_push_packets) == 0 else None)
             if not packet:
                 break
-            # st = time.time()
             self.wait_for_select_packets.append(packet)
-            # print("0 cost time {}".format(time.time() - st))
             # for multi flow
             if self.application is None:
                 return self.wait_for_select_packets.pop(0)
-        # print("1 cost time {}".format(time.time()-st))
         if constant.ENABLE_HASH_CHECK:
             last_hash_vals = [item.get_hash_val() for item in self.wait_for_select_packets]
-        # print("wait for select %d, already send %d" % (len(self.wait_for_select_packets), self.sent))
         packet_idx = self.solution.select_packet(cur_time, self.wait_for_select_packets)
         # use hash for safety
         if constant.ENABLE_HASH_CHECK:
             now_hash_vals = [item.get_hash_val() for item in self.wait_for_select_packets]
             if last_hash_vals != now_hash_vals:
                 raise ValueError("You shouldn't change the packet information in system!")
-        # st = time.time()
         if isinstance(packet_idx, int) and packet_idx >= 0:
+            # set decision order in packet
+            self.decision_order += 1
+            self.wait_for_select_packets[packet_idx].decision_order = self.decision_order
             return self.wait_for_select_packets.pop(packet_idx)
-        # print("2 cost time {}".format(time.time() - st))
         return None
 
     def apply_rate_delta(self, delta):
@@ -165,7 +163,7 @@ class Sender():
         self.cur_time = max(cur_time, self.cur_time) + 1 / self.pacing_rate
         return max(old_time-cur_time, .0), self.extra
 
-    def on_packet_acked(self, rtt, packet):
+    def on_packet_acked(self, rtt, packet, event_time):
         """
         some operation when packet acknowledged successfully at sender.
         Like updating the numbers of acked and inflight and push the acked information to it's application.
@@ -178,7 +176,7 @@ class Sender():
             self.min_latency = rtt
         self.bytes_in_flight -= BYTES_PER_PACKET
         if self.application:
-            self.application.update_block_status(packet)
+            self.application.update_block_status(packet, event_time)
 
     def on_packet_lost(self, event_time, packet):
         """
@@ -192,6 +190,19 @@ class Sender():
         # do retrans if lost
         retrans_packet = packet.create_retrans_packet(event_time)
         self.wait_for_select_packets.append(retrans_packet)
+
+    def slide_windows(self, cur_time, queue_size):
+        ret = []
+        for i in range(int(self.cwnd) - queue_size):
+            if len(self.wait_for_push_packets) == 0:
+                _packet = self.select_packet(cur_time + (1.0 / self.rate))
+                if _packet is None:
+                    return ret
+            else:
+                _packet = heapq.heappop(self.wait_for_push_packets)[2]
+            ret.append(_packet)
+
+        return ret
 
     def set_rate(self, new_rate):
         self.rate = new_rate

@@ -34,7 +34,7 @@ def measure_time():
     return wraps
 
 
-def analyze_pcc_emulator(log_file, trace_file=None, rows=None, time_range=None, scatter=False, file_range=None, sender=None):
+def analyze_emulator(log_file, trace_file=None, rows=None, time_range=None, scatter=False, file_range=None, sender=None):
 
     plt_data = []
     if file_range:
@@ -95,33 +95,6 @@ def analyze_pcc_emulator(log_file, trace_file=None, rows=None, time_range=None, 
     ax.set_xlim(data_finish_time[0] / 2, data_finish_time[-1] * 1.2)
     plt.tick_params(labelsize=tick_size)
 
-    # # plot miss deadline rate block
-    # ax = plt.subplot(pic_nums, 1, 2)
-    # ax.set_title("Acked packet lost distribution", fontsize=font_size)
-    # ax.set_ylabel("Latency / s", fontsize=font_size)
-    # ax.set_xlabel("Time / s", fontsize=font_size)
-    # ax.scatter([data_finish_time[idx] for idx in data_drop],
-    #                 [data_latency[idx] for idx in data_drop], label="Drop")
-    # ax.scatter([data_finish_time[idx] for idx in data_miss_ddl],
-    #                 [data_latency[idx] for idx in data_miss_ddl], label="Miss_deadline")
-    # plt.legend(fontsize=font_size)
-    # ax.set_xlim(data_finish_time[0] / 2, data_finish_time[-1] * 1.5)
-    # plt.tick_params(labelsize=tick_size)
-
-    # plot latency distribution
-    # ax = plt.subplot(pic_nums, 1, 2)
-    # ax.set_title("Acked packet RTT distribution", fontsize=font_size)
-    # ax.set_ylabel("RTT / s", fontsize=font_size)
-    # ax.set_xlabel("Time / s", fontsize=font_size)
-    # # ax.set_ylim(-np.min(data_sum_time)*2, np.max(data_sum_time)*2)
-    #
-    # ax.plot(data_finish_time, data_sum_time, label="Latency", linewidth=5)
-    # # plot average latency
-    # ax.plot([0, data_finish_time[-1]], [np.mean(data_sum_time)] * 2, label="Average Rtt",
-    #         c='r', linewidth=5)
-    #
-    # # ax.set_xlim(data_finish_time[0]/2, data_finish_time[-1]*1.5)
-    # plt.tick_params(labelsize=tick_size)
     handles, labels = ax.get_legend_handles_labels()
 
     # plot bandwith
@@ -134,8 +107,7 @@ def analyze_pcc_emulator(log_file, trace_file=None, rows=None, time_range=None, 
 
     plt.tight_layout()
     plt.legend(fontsize=font_size)
-    plt.savefig("output/pcc_emulator-analysis.png")
-    # plt.show()
+    plt.savefig("output/emulator-analysis.png")
 
 
 def check_solution_format(input):
@@ -248,6 +220,11 @@ def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
     for item in plt_data:
         if item["Extra"]["Cwnd"] == last_cwnd:
             continue
+        # last cwnd
+        if last_cwnd != -1:
+            data_time.append(item["Time"])
+            data_cwnd.append(last_cwnd)
+
         last_cwnd = item["Extra"]["Cwnd"]
         data_time.append(item["Time"])
         data_cwnd.append(item["Extra"]["Cwnd"])
@@ -263,16 +240,7 @@ def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
     ax.set_ylabel("Packet", fontsize=font_size)
     ax.set_xlabel("Time / s", fontsize=font_size)
     plt.tick_params(labelsize=tick_size)
-    # plt.legend(fontsize=font_size)
-    # ax.legend(fontsize=font_size)
 
-    # # plot used cwnd changing
-    # ax = plt.subplot(pic_nums, 1, 2)
-    # ax.scatter(data_time, data_Ucwnd, c='y', label="used_cwnd")
-    # ax.set_ylabel("Packet", fontsize=20)
-    # ax.set_xlabel("Time (s)", fontsize=20)
-    # plt.tick_params(labelsize=20)
-    # plt.legend(fontsize=20)
     handles, labels = ax.get_legend_handles_labels()
 
     # plot bandwith
@@ -283,7 +251,6 @@ def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
 
     plt.legend(handles, labels, fontsize=font_size)
     plt.savefig("output/cwnd_changing.png")
-    #plt.show()
 
 
 def plot_trace(data_time, ax, font_size, tick_size, trace_file):
@@ -379,7 +346,6 @@ def plot_send_rate(log_file, rows=None, trace_file=None, time_range=None, scatte
 
     plt.legend(handles, labels, fontsize=font_size)
     plt.savefig("output/send_rate_changing.png")
-    # plt.show()
 
 
 def plot_bbr(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None):
@@ -421,9 +387,6 @@ def plot_bbr(log_file, rows=None, trace_file=None, time_range=None, scatter=Fals
         data_throughput.append((idx+1-item["Extra"]["delivered"]) / used_time)
         data_bdp.append(item["Extra"]["max_bw"] * item["Extra"]["min_rtt"] if item["Extra"]["max_bw"] != float("-inf") else 0)
         data_inflight.append(item["Waiting_for_ack_nums"])
-    # print(data_time)
-    # print(data_throughput)
-    # print(data_bdp)
 
     pic = plt.figure(figsize=(50, 30 * pic_nums))
     # plot cwnd changing
@@ -449,7 +412,7 @@ def plot_bbr(log_file, rows=None, trace_file=None, time_range=None, scatter=Fals
 
     plt.legend(handles, labels, fontsize=font_size)
     plt.savefig("output/bbr_changing.png")
-    # plt.show()
+    plt.show()
 
 
 def plot_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None, size=1):
@@ -507,8 +470,7 @@ def plot_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
         labels.extend(tmp_ax.get_legend_handles_labels()[1])
 
     plt.legend(handles, labels, fontsize=font_size)
-    plt.savefig("output/rate_changing.png", dpi=pic.dpi)
-    # plt.show()
+    plt.savefig("output/rate_changing.png")
 
 
 if __name__ == '__main__':
@@ -516,6 +478,6 @@ if __name__ == '__main__':
     log_packet_file = "output/packet_log/packet-0.log"
     trace_file = "config/trace.txt"
     new_trace_file = "scripts/first_group/traces_1.txt"
-    # analyze_pcc_emulator(log_packet_file, time_range=None, scatter=False, trace_file=new_trace_file, file_range="all")
+    # analyze_emulator(log_packet_file, time_range=None, scatter=False, trace_file=new_trace_file, file_range="all")
     # plot_cwnd(log_packet_file, None, trace_file=new_trace_file, time_range=None, scatter=False, file_range="all")
     plot_rate(log_packet_file, file_range="all", scatter=False)

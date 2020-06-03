@@ -8,11 +8,11 @@
 # @Time : 2020/4/10 15:52
 '''
 
-from objects.pcc_emulator import PccEmulator
-from utils import analyze_pcc_emulator, plot_cwnd, plot_rate
+from objects.emulator import Emulator
+from utils import analyze_emulator, plot_cwnd, plot_rate
 import os, sys, inspect, random
 from config.constant import *
-from objects.windows_based_sender import Sender as WinSender
+from objects.sender import Sender as WinSender
 from objects.engine import Engine
 from objects.link import Link
 
@@ -28,30 +28,16 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
 
-# class BbrSolution(BBR, PacketSelection):
-#     pass
-
-
 class RenoSolution(Reno, PacketSelection):
     pass
 
 
 class NormalSolution(MTR, PacketSelection):
     pass
-    # def __init__(self):
-    #     super().__init__()
-    #     self.send_rate = 100
-    #     self.USE_CWND = False
-    #
-    # def make_decision(self, cur_time):
-    #     return {
-    #         "send_rate": self.send_rate
-    #     }
 
 
 def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
-
-    emulator = PccEmulator(
+    emulator = Emulator(
         block_file=block_file,
         trace_file=trace_file,
         senders=[],
@@ -81,15 +67,15 @@ if __name__ == '__main__':
 
     block_file = "config/block.txt"
     trace_file = "config/trace.txt"
-    log_file = "output/pcc_emulator.log"
+    log_file = "output/emulator.log"
     log_packet_file = "output/packet_log/packet-0.log"
 
     new_trace_file = "scripts/first_group/traces_81.txt"
     new_block_files = ["config/data_video.csv", "config/data_audio.csv"]
 
     tmp = NormalSolution()
-    tmp.init_trace(new_trace_file)
-    emulator = create_2flow_emulator(RenoSolution(), block_file, new_trace_file)
+    tmp.init_trace(trace_file)
+    emulator = create_2flow_emulator(RenoSolution(), block_file, trace_file, ENABLE_LOG=True)
 
     print(emulator.run_for_dur(20))
     emulator.dump_events_to_file(log_file)
@@ -97,6 +83,6 @@ if __name__ == '__main__':
     print(emulator.senders[0].application.ack_blocks)
     from qoe_model import cal_qoe
     print(cal_qoe(0.9))
-    # analyze_pcc_emulator(log_packet_file, file_range="all")
+    # analyze_emulator(log_packet_file, file_range="all")
     # plot_cwnd(log_packet_file, trace_file=trace_file, file_range="all")
     # plot_throughput(log_packet_file, trace_file=trace_file, file_range="all")

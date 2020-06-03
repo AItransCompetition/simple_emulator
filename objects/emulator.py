@@ -4,7 +4,7 @@ import numpy as np
 from utils import (
     get_emulator_info, measure_time
 )
-from objects.windows_based_sender import Sender as W_sender
+from objects.sender import Sender
 from objects.link import Link
 from objects.engine import Engine
 
@@ -17,7 +17,7 @@ if "simple_emulator" not in parentdir:
     parentdir += "simple_emulator"
 
 
-class PccEmulator(object):
+class Emulator(object):
 
     def __init__(self,
                  block_file=None,
@@ -25,6 +25,7 @@ class PccEmulator(object):
                  queue_range=None,
                  solution=None,
                  **kwargs):
+        self.extra = kwargs
         # do configure on constant
         self.update_config(kwargs)
 
@@ -45,13 +46,16 @@ class PccEmulator(object):
         self.senders = None
         self.solution = solution
         self.trace_list = None
-        if "senders" in kwargs:
-            self.senders = kwargs["senders"]
-        if "links" in kwargs:
-            self.links = kwargs["links"]
+
         if "senders" not in kwargs and "links" not in kwargs:
             self.create_new_links_and_senders()
-        self.net = Engine(self.senders, self.links)
+        if "senders" in kwargs:
+            self.senders = kwargs["senders"]
+            kwargs.pop("senders")
+        if "links" in kwargs:
+            self.links = kwargs["links"]
+            kwargs.pop("links")
+        self.net = Engine(self.senders, self.links, **kwargs)
 
     def update_config(self, extra):
         """make it available that change some variable in constant.py by the way of transmitting function parameters."""
@@ -69,6 +73,24 @@ class PccEmulator(object):
             constant.MIN_QUEUE = extra["MIN_QUEUE"]
         if "MAX_QUEUE" in extra:
             constant.MAX_QUEUE = extra["MAX_QUEUE"]
+        if "SEED" in extra:
+            random.seed(extra["SEED"])
+        if "RUN_DIR" in extra:
+            self.extra["RUN_DIR"] = extra["RUN_DIR"]
+            import platform
+            try:
+                if os.path.exists(extra["RUN_DIR"] + "/output"):
+                    if platform.system() == "Windows":
+                        # for windows
+                        os.system("rmdir /Q /S \"" + extra["RUN_DIR"] + "/output\"")
+                    else:
+                        # for linux
+                        os.system("rm -rf \"" + extra["RUN_DIR"] + "/output")
+                os.mkdir(extra["RUN_DIR"] + "/output")
+                os.mkdir(extra["RUN_DIR"] + "/output/packet_log")
+            except Exception as e:
+                # print(extra["RUN_DIR"] + "/output")
+                pass
 
     def get_trace(self):
         """init the "trace_list" according to the trace file."""
@@ -102,10 +124,10 @@ class PccEmulator(object):
         if hasattr(solution, "USE_CWND"):
             constant.USE_CWND = solution.USE_CWND
 
-        self.senders = [W_sender(self.links, 0, self.features,
+        self.senders = [Sender(self.links, 0, self.features,
                                history_len=self.history_len, solution=solution)]
         for item in self.senders:
-            item.init_application(self.block_file)
+            item.init_application(self.block_file, **self.extra)
 
     # @measure_time()
     def run_for_dur(self, during_time=float("inf")):
