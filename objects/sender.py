@@ -88,7 +88,7 @@ class Sender():
         :return:
         """
         # Is it necessary ? Reduce system burden by delete the packets missing ddl in time
-        # self.clear_miss_ddl(cur_time)
+        self.clear_miss_ddl(cur_time)
         while True:
             # if there is no packet can be sended, we need to send packet that created after cur_time
             packet = self.new_packet(cur_time, "force" if len(self.wait_for_select_packets) + len(self.wait_for_push_packets) == 0 else None)
@@ -109,8 +109,15 @@ class Sender():
         if isinstance(packet_idx, int) and packet_idx >= 0:
             # set decision order in packet
             self.decision_order += 1
-            self.wait_for_select_packets[packet_idx].decision_order = self.decision_order
-            return self.wait_for_select_packets.pop(packet_idx)
+            _packet = self.wait_for_select_packets[packet_idx]
+            _packet.decision_order = self.decision_order
+            # create next offset packet
+            next_packet = _packet.next_offset()
+            if next_packet:
+                self.wait_for_select_packets[packet_idx] = next_packet
+            else:
+                self.wait_for_select_packets.pop(packet_idx)
+            return _packet
         return None
 
     def apply_rate_delta(self, delta):

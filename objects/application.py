@@ -50,6 +50,7 @@ class AppicationLayer(object):
                 self.create_blok_by_csv(single_file)
             else:
                 self.create_block_by_file(single_file, self.create_det)
+        self.block_queue = sorted(lambda x:x.timestamp, self.block_queue)
 
     def create_blok_by_csv(self, csv_file):
         df_data = pd.read_csv(csv_file, header=None)
@@ -105,35 +106,12 @@ class AppicationLayer(object):
                               priority=pattern[ch]["type"])
                 self.block_queue.append(block)
 
-    def select_algorithm(self, cur_time, block_queue):
-        '''
-        The alogrithm to select the block which will be sended in next.
-        The following example is selecting block by the radio of rest life time to deadline.
-        :param cur_time: float
-        :param block_queue: the list of Block.You can get more detail about Block in objects/blocks.py
-        :return: int
-        '''
-        def is_better(block):
-            return (cur_time - block.timestamp) * best_block.deadline > \
-                    (cur_time - best_block.timestamp) * block.deadline
-
-        best_block_idx = -1
-        best_block = None
-        for idx, item in enumerate(block_queue):
-            if best_block is None or is_better(item) :
-                best_block_idx = idx
-                best_block = item
-
-        return best_block_idx
-
     def select_block(self):
         """select the block that not sent and return it  """
         cur_time = self.init_time + self.pass_time
-        # call player's code
-        best_block_idx = self.select_algorithm(cur_time, self.block_queue)
-        if best_block_idx == -1:
+        if len(self.block_queue) == 0:
             return None
-        best_block = self.block_queue.pop(best_block_idx)
+        best_block = self.block_queue.pop(0)
         # Is it necessary ? filter block with missing ddl
         for idx in range(len(self.block_queue)-1, -1, -1):
             item = self.block_queue[idx]
@@ -153,7 +131,7 @@ class AppicationLayer(object):
         :return: Packet.
         """
         self.pass_time = cur_time
-        if self.now_block is None or self.now_block_offset == self.now_block.split_nums:
+        if self.now_block is None:
             self.now_block = self.select_block()
             if self.now_block is None:
                 return None
@@ -174,13 +152,12 @@ class AppicationLayer(object):
 
         packet = Packet(create_time=self.now_block.timestamp,
                           next_hop=0,
-                          offset=self.now_block_offset,
+                          offset=0,
                           packet_size=self.bytes_per_packet,
                           payload=payload,
                           block_info=self.now_block.get_block_info()
                           )
-        self.now_block_offset += 1
-
+        self.now_block = None
         return packet
 
     def update_block_status(self, packet, cur_time):
