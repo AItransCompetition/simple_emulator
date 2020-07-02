@@ -50,7 +50,7 @@ class AppicationLayer(object):
                 self.create_blok_by_csv(single_file)
             else:
                 self.create_block_by_file(single_file, self.create_det)
-        self.block_queue = sorted(lambda x:x.timestamp, self.block_queue)
+        self.block_queue = sorted(self.block_queue, key=lambda x:x.timestamp)
 
     def create_blok_by_csv(self, csv_file):
         df_data = pd.read_csv(csv_file, header=None)
