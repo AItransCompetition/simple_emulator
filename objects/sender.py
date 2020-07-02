@@ -72,6 +72,8 @@ class Sender():
 
     def clear_miss_ddl(self, cur_time):
         """pop these packets with missing deadline at time of "cur_time"."""
+        if not self.application:
+            return
         for idx in range(len(self.wait_for_select_packets)-1, -1, -1):
             item = self.wait_for_select_packets[idx]
             if item.is_miss_ddl(cur_time):
