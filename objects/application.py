@@ -71,7 +71,7 @@ class AppicationLayer(object):
             elif "audio" in csv_file:
                 priority = 1
             if "priority-" in csv_file:
-                priority = csv_file[int(csv_file.index("priority-") + len("priority-"))]
+                priority = int(csv_file[int(csv_file.index("priority-") + len("priority-"))])
             # change deadline
             if "ddl-" in csv_file:
                 idx = csv_file.index("ddl-") + len("ddl-")
