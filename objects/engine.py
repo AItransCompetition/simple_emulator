@@ -14,7 +14,6 @@ class Engine():
         self.links = links
         self.queue_initial_packets()
 
-        self.fir_log = True
         self.log_packet_file = "output/packet_log/packet-0.log"
         self.log_items = 0
         self.last_alert_time = 0
@@ -167,11 +166,9 @@ class Engine():
     def get_true_log_file(self):
         """if the rows of single log file is limited to MAX_PACKET_LOG_ROWS, find the name of next new log file."""
         if isinstance(constant.MAX_PACKET_LOG_ROWS, int) and constant.MAX_PACKET_LOG_ROWS > 0:
-            file_nums = self.log_items // constant.MAX_PACKET_LOG_ROWS - 1
-            if self.log_items and self.log_items % constant.MAX_PACKET_LOG_ROWS == 0:
-                self.fir_log = True
+            file_nums = self.log_items
+            self.log_items += 1
             return self.run_dir + self.log_packet_file.replace('0', str(file_nums))
-        return self.run_dir + self.log_packet_file
 
     def log_packet(self, event_time, sender, packet):
         """
@@ -203,7 +200,6 @@ class Engine():
         # log_data["Extra"]["in_event_nums"] = sender.in_event_nums
         # log_data["Extra"]["wait_for_select"] = len(sender.wait_for_select_packets)
         # log_data["Extra"]["wait_for_push"] = len(sender.wait_for_push_packets)
-        self.log_items += 1
         self.tmp_log.append(log_data)
         if len(self.tmp_log) % constant.MAX_PACKET_LOG_ROWS == 0:
             self.flush_log()
