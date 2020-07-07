@@ -42,7 +42,8 @@ class Block(object):
             "Priority" : self.priority,
             "Deadline" : self.deadline,
             "Create_time" : self.timestamp,
-            "Size" : self.size
+            "Size" : self.size,
+            "Split_nums" : self.split_nums
         }
 
     def is_miss_ddl(self):

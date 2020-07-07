@@ -14,10 +14,10 @@ class Engine():
         self.links = links
         self.queue_initial_packets()
 
-        self.fir_log = True
         self.log_packet_file = "output/packet_log/packet-0.log"
         self.log_items = 0
         self.last_alert_time = 0
+        self.tmp_log = []
 
     def update_config(self, extra):
         self.run_dir = extra["RUN_DIR"]+'/' if "RUN_DIR" in extra else ''
@@ -163,6 +163,13 @@ class Engine():
         # reward = (throughput / RATE_OBS_SCALE) * np.exp(-1 * (LATENCY_PENALTY * latency / LAT_OBS_SCALE + LOSS_PENALTY * loss))
         return reward * REWARD_SCALE
 
+    def get_true_log_file(self):
+        """if the rows of single log file is limited to MAX_PACKET_LOG_ROWS, find the name of next new log file."""
+        if isinstance(constant.MAX_PACKET_LOG_ROWS, int) and constant.MAX_PACKET_LOG_ROWS > 0:
+            file_nums = self.log_items
+            self.log_items += 1
+            return self.run_dir + self.log_packet_file.replace('0', str(file_nums))
+
     def log_packet(self, event_time, sender, packet):
         """
         log the event information.
@@ -174,25 +181,11 @@ class Engine():
         if not constant.ENABLE_LOG:
             return packet
 
-        def get_true_log_file():
-            """if the rows of single log file is limited to MAX_PACKET_LOG_ROWS, find the name of next new log file."""
-            if isinstance(constant.MAX_PACKET_LOG_ROWS, int) and constant.MAX_PACKET_LOG_ROWS > 0:
-                file_nums = self.log_items // constant.MAX_PACKET_LOG_ROWS
-                if self.log_items and self.log_items % constant.MAX_PACKET_LOG_ROWS == 0:
-                    self.fir_log = True
-                return self.run_dir + self.log_packet_file.replace('0', str(file_nums))
-            return self.run_dir + self.log_packet_file
-
         if constant.ENABLE_DEBUG and event_time - self.last_alert_time >= ALERT_CIRCLE:
             self.last_alert_time = event_time
             sender_mi = self.senders[0].get_run_data()
             print("Time : {}".format(event_time))
             print(get_emulator_info(sender_mi))
-
-        if self.fir_log:
-            self.fir_log = False
-            with open(get_true_log_file(), "w") as f:
-                pass
 
         log_data = {
             "Time" : event_time,
@@ -207,10 +200,16 @@ class Engine():
         # log_data["Extra"]["in_event_nums"] = sender.in_event_nums
         # log_data["Extra"]["wait_for_select"] = len(sender.wait_for_select_packets)
         # log_data["Extra"]["wait_for_push"] = len(sender.wait_for_push_packets)
-        with open(get_true_log_file(), "a") as f:
-            f.write(json.dumps(log_data, ensure_ascii = False)+"\n")
-        self.log_items += 1
+        self.tmp_log.append(log_data)
+        if len(self.tmp_log) % constant.MAX_PACKET_LOG_ROWS == 0:
+            self.flush_log()
         return packet
+
+    def flush_log(self):
+        with open(self.get_true_log_file(), "w") as f:
+            for item in self.tmp_log:
+                f.write(json.dumps(item, ensure_ascii=False) + "\n")
+        self.tmp_log = []
 
     def append_cc_input(self, event_time, sender, packet, event_type="packet"):
         """push the acked or lost packet event to it's sender"""
@@ -238,7 +237,7 @@ class Engine():
 
     def close(self):
         """close all the application before closing this system."""
-
+        self.flush_log()
         for sender in self.senders:
             debug_print("sender {} wait_for_push_packets size {}".format(sender.id, len(sender.wait_for_push_packets)))
             if sender.application:
