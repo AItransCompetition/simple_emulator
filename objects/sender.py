@@ -45,6 +45,8 @@ class Sender():
         self.in_event_nums = 0
         # record packet's decision order
         self.decision_order = 0
+        # dict for packet needing to retransmission
+        self.retrans_dict = dict()
 
     _next_id = 1
 
@@ -79,6 +81,14 @@ class Sender():
             if item.is_miss_ddl(cur_time):
                 self.wait_for_select_packets.pop(idx)
 
+    def append_retrans_packet(self):
+        if self.application is None:
+            return
+        block_list = [packet.block_info["Block_id"] for packet in self.wait_for_select_packets]
+        for block in self.retrans_dict:
+            if block not in block_list and len(self.retrans_dict[block]) > 0:
+                self.wait_for_select_packets.append(self.retrans_dict[block].pop(0))
+
     # @measure_time()
     def select_packet(self, cur_time):
         """
@@ -100,6 +110,8 @@ class Sender():
             # for multi flow
             if self.application is None:
                 return self.wait_for_select_packets.pop(0)
+        # append retrans packet which nat in selecing queue
+        self.append_retrans_packet()
         if constant.ENABLE_HASH_CHECK:
             last_hash_vals = [item.get_hash_val() for item in self.wait_for_select_packets]
         packet_idx = self.solution.select_packet(cur_time, self.wait_for_select_packets)
@@ -113,12 +125,19 @@ class Sender():
             self.decision_order += 1
             _packet = self.wait_for_select_packets[packet_idx]
             _packet.decision_order = self.decision_order
-            # create next offset packet
-            next_packet = _packet.next_offset()
-            if next_packet:
-                self.wait_for_select_packets[packet_idx] = next_packet
-            else:
-                self.wait_for_select_packets.pop(packet_idx)
+            if self.application:
+                # create next offset packet
+                next_packet = _packet.next_offset()
+                if next_packet:
+                    self.wait_for_select_packets[packet_idx] = next_packet
+                else:
+                    block_id = _packet.block_info["Block_id"]
+                    # whether or not there are rest of packet needing to retransmission
+                    if block_id in self.retrans_dict and len(self.retrans_dict[block_id]) > 0:
+                        self.wait_for_select_packets[packet_idx] = self.retrans_dict[block_id].pop(0)
+                    else:
+                        # finished block
+                        self.wait_for_select_packets.pop(packet_idx)
             return _packet
         return None
 
@@ -196,9 +215,15 @@ class Sender():
         """
         self.lost += 1
         self.bytes_in_flight -= BYTES_PER_PACKET
-        # do retrans if lost
-        retrans_packet = packet.create_retrans_packet(event_time)
-        self.wait_for_select_packets.append(retrans_packet)
+        if self.application:
+            # do retrans if lost
+            retrans_packet = packet.create_retrans_packet(event_time)
+            retrans_block_id = retrans_packet.block_info["Block_id"]
+            # save retransmission packet in dict
+            if retrans_block_id in self.retrans_dict:
+                self.retrans_dict[retrans_block_id].append(retrans_packet)
+            else:
+                self.retrans_dict[retrans_block_id] = [retrans_packet]
 
     def slide_windows(self, cur_time, queue_size):
         ret = []
