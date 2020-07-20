@@ -73,10 +73,10 @@ class AppicationLayer(object):
                 priority = csv_file[int(csv_file.index("priority-") + len("priority-"))]
             # change deadline
             if "ddl-" in csv_file:
-                idx = csv_file.index("ddl-") + len("ddl-")
-                for i in range(idx, len(csv_file)):
+                st = csv_file.index("ddl-") + len("ddl-")
+                for i in range(st, len(csv_file)):
                     if csv_file[i] == '-':
-                        deadline = float(csv_file[idx:i])
+                        deadline = float(csv_file[st:i])
                         break
             # create block
             block = Block(bytes_size=float(df_data["size"][idx])*det,
