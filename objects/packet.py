@@ -13,7 +13,8 @@ class Packet(object):
                  send_delay=.0,
                  pacing_delay=.0,
                  latency=.0,
-                 block_info={}
+                 block_info={},
+                 retrans=False
                  ):
         self.packet_type = packet_type
         self.create_time = create_time
@@ -31,6 +32,7 @@ class Packet(object):
         self.extra = {}
         self.block_info = block_info
         self.decision_order = 0
+        self.retrans = retrans
 
         if packet_id is None:
             self.packet_id = Packet._get_next_packet()
@@ -49,6 +51,19 @@ class Packet(object):
                     offset=-1,
                     packet_size=kwargs["packet_size"],
                     payload=-1)
+
+    def next_offset(self):
+        if self.offset + 1 == self.block_info["Split_nums"] or self.retrans:
+            return None
+        payload = self.payload if self.offset + 2  < self.block_info["Split_nums"] else self.block_info["Size"] % self.payload
+
+        return Packet(create_time=self.create_time,
+                      next_hop=0,
+                      offset=self.offset+1,
+                      packet_size=self.packet_size,
+                      payload=payload,
+                      block_info=self.block_info,
+                      send_delay=self.send_delay)
 
     def parse(self):
 
@@ -86,7 +101,8 @@ class Packet(object):
                       offset=self.offset,
                       packet_size=self.packet_size,
                       payload=self.payload,
-                      block_info=self.block_info)
+                      block_info=self.block_info,
+                      retrans=True)
 
     def get_hash_val(self):
         """get the hash value of this packet according to it's member variables."""
