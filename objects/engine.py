@@ -30,7 +30,7 @@ class Engine():
             packet = sender.select_packet(1.0 / sender.rate) # sender.new_packet(1.0 / sender.rate)
             if packet:
                 sender.in_event_nums += 1
-                heapq.heappush(self.q, (1.0 / sender.rate, sender, packet))
+                heapq.heappush(self.q, (max(1.0 / sender.rate, packet.create_time), sender, packet))
 
     def reset(self):
         self.cur_time = 0.0
