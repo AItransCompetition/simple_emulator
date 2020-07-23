@@ -230,6 +230,9 @@ class Engine():
             }
 
         feed_back = sender.solution.append_input(data)
+        # clear memory from solution._input_list
+        if hasattr(sender.solution, "_input_list") and len(sender.solution._input_list) > 10000:
+            sender.solution._input_list = sender.solution._input_list[5000:]
         if feed_back:
             sender.cwnd = feed_back["cwnd"] if "cwnd" in feed_back else sender.cwnd
             sender.rate = feed_back["send_rate"] if "send_rate" in feed_back else sender.rate
