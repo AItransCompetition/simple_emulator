@@ -109,9 +109,6 @@ class AppicationLayer(object):
     def select_block(self):
         """select the block that not sent and return it  """
         cur_time = self.init_time + self.pass_time
-        if len(self.block_queue) == 0:
-            return None
-        best_block = self.block_queue.pop(0)
         # Is it necessary ? filter block with missing ddl
         for idx in range(len(self.block_queue)-1, -1, -1):
             item = self.block_queue[idx]
@@ -120,6 +117,10 @@ class AppicationLayer(object):
                 self.block_queue[idx].miss_ddl = 1
                 self.log_block(self.block_queue[idx])
                 self.block_queue.pop(idx)
+        
+        if len(self.block_queue) == 0:
+            return None
+        best_block = self.block_queue.pop(0)
 
         return best_block
 

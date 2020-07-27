@@ -99,6 +99,8 @@ class Sender():
         :param cur_time:
         :return:
         """
+        # append retrans packet which nat in selecing queue
+        self.append_retrans_packet()
         # Is it necessary ? Reduce system burden by delete the packets missing ddl in time
         self.clear_miss_ddl(cur_time)
         while True:
@@ -110,8 +112,7 @@ class Sender():
             # for multi flow
             if self.application is None:
                 return self.wait_for_select_packets.pop(0)
-        # append retrans packet which nat in selecing queue
-        self.append_retrans_packet()
+        
         if constant.ENABLE_HASH_CHECK:
             last_hash_vals = [item.get_hash_val() for item in self.wait_for_select_packets]
         packet_idx = self.solution.select_packet(cur_time, self.wait_for_select_packets)
