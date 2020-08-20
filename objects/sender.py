@@ -170,7 +170,7 @@ class Sender():
         ret = self.solution.make_decision(cur_time)
         self.rate = ret["send_rate"] if "send_rate" in ret else self.rate
         self.cwnd = ret["cwnd"] if "cwnd" in ret else self.cwnd
-        self.extra = ret["extra"] if "extra" in ret else self.extra
+        self.extra = ret["extra"] if "extra" in ret else {}
         if self.USE_CWND:
             return int(self.bytes_in_flight) / BYTES_PER_PACKET < self.cwnd
         else:
