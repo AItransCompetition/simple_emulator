@@ -106,10 +106,12 @@ class Sender():
         while True:
             # if there is no packet can be sended, we need to send packet that created after cur_time
             packet = self.new_packet(cur_time, "force" if len(self.wait_for_select_packets) + len(self.wait_for_push_packets) == 0 else None)
-            # if mode == force
-            cur_time = max(cur_time, packet.create_time)
+            
             if not packet:
                 break
+            # if mode == force, update current time
+            cur_time = max(cur_time, packet.create_time)
+            
             self.wait_for_select_packets.append(packet)
             # for multi flow
             if self.application is None:
