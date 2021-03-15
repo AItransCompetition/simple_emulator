@@ -8,7 +8,7 @@
 # @Time : 2020/4/10 15:52
 '''
 
-from objects.emulator import PccEmulator
+from objects.emulator import SimpleEmulator
 from utils import analyze_pcc_emulator, plot_cwnd, plot_rate
 import os, sys, inspect, random
 from config.constant import *
@@ -19,7 +19,7 @@ from objects.link import Link
 from player.examples.reno import Reno
 # from player.examples.simple_bbr import BBR
 from player.examples.match_trace_rate import MTR
-from player.packet_selection import Solution as Packet_selection
+from player.packet_selection import Solution as PacketSelection
 from objects.cc_base import CongestionControl
 
 
@@ -28,16 +28,16 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
 
-class RenoSolution(Reno, Packet_selection):
+class RenoSolution(Reno, PacketSelection):
     pass
 
 
-class NormalSolution(MTR, Packet_selection):
+class NormalSolution(MTR, PacketSelection):
     pass
 
 
 def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
-    emulator = PccEmulator(
+    emulator = SimpleEmulator(
         block_file=block_file,
         trace_file=trace_file,
         senders=[],

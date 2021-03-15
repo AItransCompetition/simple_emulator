@@ -68,7 +68,7 @@ Here are the 3 methods that players need to finished.
 
 It should be implemented with these method :
 
-- [select_packet](#select_packet)
+- [select_block](#select_block)
 - [make_decision](#make_decision)
 - [append_input](#append_input)
 
@@ -78,13 +78,13 @@ Here is the explanations of [Input](#Input) and [Output](#Output) .
 
 ### packet_selection.py
 
-In this module, you have to implement the function "select_packet" with the parameters "cur_time, packet_queue" and return an integer value which means the packet index in packet queue, which will be sent at the time "cur_time".
+In this module, you have to implement the function "select_block" with the parameters "cur_time, block_queue" and return an integer value which means the block index in block queue, which will be sent at the time "cur_time".
 
-Here we provided a [example](https://github.com/Azson/DTP-emulator/blob/pcc-emulator/player/packet_selection.py) of selecting packet by the **create time** firstly, and **radio of rest life time to deadline** secondly.
+Here we provided a [example](https://github.com/Azson/DTP-emulator/blob/pcc-emulator/player/packet_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
 
-#### select_packet
+#### select_block
 
-For every packet in packet queue, it's implement in "objects/packet.py". But we recommend you to get more information at  [Packet](#packet-log) .
+For every block in block queue, it's implement in "objects/block.py". But we recommend you to get more information at  [Block](#block-log) .
 
 ### congestion_control_algorithm.py
 
@@ -343,7 +343,7 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 |     Cwnd     |        发送端当前时刻的拥塞窗口大小        | 10（packet）  |
 |  Send_rate   |        发送端当前时刻的发送速率大小        | 5（packet/s） |
 
-## Table : packet_queue
+## Table : block_queue
 
 |   变量名    |                             含义                             |     样例      |
 | :---------: | :----------------------------------------------------------: | :-----------: |
