@@ -119,7 +119,7 @@ class Sender():
         
         if constant.ENABLE_HASH_CHECK:
             last_hash_vals = [item.get_hash_val() for item in self.wait_for_select_packets]
-        packet_idx = self.solution.select_packet(cur_time, self.wait_for_select_packets)
+        packet_idx = self.solution.select_block(cur_time, self.wait_for_select_packets)
         # use hash for safety
         if constant.ENABLE_HASH_CHECK:
             now_hash_vals = [item.get_hash_val() for item in self.wait_for_select_packets]

@@ -14,12 +14,12 @@ There may be some differences between this and below. But you can finished accor
 - create your module
 
 ```python
-from simple_emulator import PacketSelection, CongestionControl
+from simple_emulator import BlockSelection, CongestionControl
 
 
 # Your solution should include packet selection and congestion control.
 # So, we recommend you to achieve it by inherit the objects we provided and overwritten necessary method.
-class Solution(PacketSelection, CongestionControl):
+class Solution(BlockSelection, CongestionControl):
     pass
 ```
 
@@ -72,15 +72,15 @@ It should be implemented with these method :
 - [make_decision](#make_decision)
 - [append_input](#append_input)
 
-In case you forget, we recommend you implement by inheriting the objects from Solution in packet_selection.py and Solution in congestion_control_algorithm.py and overwrite these methods.
+In case you forget, we recommend you implement by inheriting the objects from Solution in block_selection.py and Solution in congestion_control_algorithm.py and overwrite these methods.
 
 Here is the explanations of [Input](#Input) and [Output](#Output) .
 
-### packet_selection.py
+### block_selection.py
 
 In this module, you have to implement the function "select_block" with the parameters "cur_time, block_queue" and return an integer value which means the block index in block queue, which will be sent at the time "cur_time".
 
-Here we provided a [example](https://github.com/Azson/DTP-emulator/blob/pcc-emulator/player/packet_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
+Here we provided a [example](https://github.com/Azson/DTP-emulator/blob/pcc-emulator/player/block_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
 
 #### select_block
 

@@ -1,6 +1,6 @@
-from player.packet_selection import Solution as PacketSelection
+from player.block_selection import Solution as BlockSelection
 from player.examples.reno import Reno
 
 
-class Solution(Reno, PacketSelection):
+class Solution(Reno, BlockSelection):
     pass

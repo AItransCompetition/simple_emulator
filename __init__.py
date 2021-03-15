@@ -8,7 +8,7 @@ sys.path.insert(0, parentdir+"/simple_emulator")
 
 from objects.emulator import SimpleEmulator
 from objects.cc_base import CongestionControl
-from player.packet_selection import Solution as PacketSelection
+from player.block_selection import Solution as BlockSelection
 from utils import *
 from config.constant import *
 from config import constant
@@ -23,7 +23,7 @@ from qoe_model import cal_qoe
 # from scripts.network import create_network, create_trace
 
 
-__all__ = ["SimpleEmulator", "CongestionControl", "PacketSelection", \
+__all__ = ["SimpleEmulator", "CongestionControl", "BlockSelection", \
            "analyze_pcc_emulator", "plot_cwnd", "plot_rate", \
            "Reno", "create_2flow_emulator", "constant", \
            "cal_qoe"]

@@ -19,7 +19,7 @@ from objects.link import Link
 from player.examples.reno import Reno
 # from player.examples.simple_bbr import BBR
 from player.examples.match_trace_rate import MTR
-from player.packet_selection import Solution as PacketSelection
+from player.block_selection import Solution as BlockSelection
 from objects.cc_base import CongestionControl
 
 
@@ -28,11 +28,11 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
 
-class RenoSolution(Reno, PacketSelection):
+class RenoSolution(Reno, BlockSelection):
     pass
 
 
-class NormalSolution(MTR, PacketSelection):
+class NormalSolution(MTR, BlockSelection):
     pass
 
 
