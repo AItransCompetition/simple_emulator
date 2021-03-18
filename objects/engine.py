@@ -229,7 +229,7 @@ class Engine():
 
             }
 
-        feed_back = sender.solution.append_input(data)
+        feed_back = sender.solution.cc_trigger(data)
         # clear memory from solution._input_list
         if hasattr(sender.solution, "_input_list") and len(sender.solution._input_list) > 10000:
             sender.solution._input_list = sender.solution._input_list[5000:]

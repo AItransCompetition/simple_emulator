@@ -2,10 +2,10 @@
 
 ## For pypi
 
-We have package our repository into [DTP_Emulator](https://pypi.org/project/DTP-Emulator/),
+We have package our repository into [Simple-Emulator](https://pypi.org/project/Simple-Emulator/),
 which means that you can run order
 
-> pip install DTP-Emulator
+> pip install Simple-Emulator
 
 to install it.
 
@@ -56,7 +56,7 @@ Then, just run the order "python3 main.py".
 
 You will get some output in the path "/output/" and should fix your code according to the output.
 
-Here is an complete  [demo](https://github.com/Azson/DTP-emulator/blob/pcc-emulator/deom_2.py) about the using of this repository.
+Here is an complete  [demo](https://github.com/Azson/Simple-emulator/blob/emulator/deom_2.py) about the using of this repository.
 
 # For Detail
 
@@ -69,8 +69,8 @@ Here are the 3 methods that players need to finished.
 It should be implemented with these method :
 
 - [select_block](#select_block)
-- [make_decision](#make_decision)
-- [append_input](#append_input)
+- [on_packet_sent](#on_packet_sent)
+- [cc_trigger](#cc_trigger)
 
 In case you forget, we recommend you implement by inheriting the objects from Solution in block_selection.py and Solution in congestion_control_algorithm.py and overwrite these methods.
 
@@ -80,7 +80,7 @@ Here is the explanations of [Input](#Input) and [Output](#Output) .
 
 In this module, you have to implement the function "select_block" with the parameters "cur_time, block_queue" and return an integer value which means the block index in block queue, which will be sent at the time "cur_time".
 
-Here we provided a [example](https://github.com/Azson/DTP-emulator/blob/pcc-emulator/player/block_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
+Here we provided a [example](https://github.com/Azson/Simple-emulator/blob/emulator/player/block_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
 
 #### select_block
 
@@ -88,14 +88,14 @@ For every block in block queue, it's implement in "objects/block.py". But we rec
 
 ### congestion_control_algorithm.py
 
-In this module, you have to implement a class with member function "make_decision" and "append_input". So we recommend you to accomplish this by inheriting from the object of "CongestionControl" implemented in "cc_base.py" in case you forget these. 
+In this module, you have to implement a class with member function "on_packet_sent" and "cc_trigger". So we recommend you to accomplish this by inheriting from the object of "CongestionControl" implemented in "cc_base.py" in case you forget these. 
 
 Here we provided some simple algorithms about congestion control to help you being familiar with this competition.
-Like [Reno](https://github.com/AItransCompetition/DTP_Demo/blob/master/demo_reno.py) and an example about [reinforcement learning](https://github.com/AItransCompetition/DTP_Demo/blob/master/demo_rl.py) implemented by tensorflow.
+Like [Reno](https://github.com/AItransCompetition/Simple_Demo/blob/master/demo_reno.py) and an example about [reinforcement learning](https://github.com/AItransCompetition/Simple_Demo/blob/master/demo_rl.py) implemented by tensorflow.
 
-#### make_decision
+#### on_packet_sent
 
-For the member function "make_decision", we will call it every time I want to send a packet. And it should return a dictionary with window size and send rate according to the information from "_input_list", just like below.
+For the member function "on_packet_sent", we will call it every time I want to send a packet. And it should return a dictionary with window size and send rate according to the information from "_input_list", just like below.
 
 ```json
 {
@@ -104,7 +104,7 @@ For the member function "make_decision", we will call it every time I want to se
 }
 ```
 
-#### append_input
+#### cc_trigger
 
 For every item information in "_input_list",  it is a triad of **(event_time, event_type, and packet_information_dict)**. 
 
@@ -128,7 +128,7 @@ For every item information in "_input_list",  it is a triad of **(event_time, ev
 
 Why we design a individual function to add element to "_input_list"?
 
-It's because there are some congestion control algorithm that need to update window size and send rate immediately. So you need to return a dictionary with window size and send rate if you want to do some changes as soon as the data is received , like [here](#make_decision).
+It's because there are some congestion control algorithm that need to update window size and send rate immediately. So you need to return a dictionary with window size and send rate if you want to do some changes as soon as the data is received , like [here](#on_packet_sent).
 
 ## The calculation of score
 
@@ -254,7 +254,7 @@ Here is every key's explanation：
 - Payload : The size of valid data in packet whose unit is bytes;
 - Packet_size : The size of the packet whose unit is bytes;
 - Extra : The filed we provided for your congestion control. 
-We will fill it when system need to send packet (equals to calling "make_decision" method in your solution).
+We will fill it when system need to send packet (equals to calling "on_packet_sent" method in your solution).
     - Cwnd : The size of crowded window at sender.Its unit is packet; 
 - Block_info : The block information that the packet belong to. You can get more from below.
 
@@ -389,7 +389,7 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 |   Payload    |              该包实际有效的Block数据大小(Bytes)              | 1480（Byte） |
 | Packet_size  |                     该包实际大小(Bytes)                      | 1500（Byte） |
 |  Block_info  | 该包所属Block的信息，类型为dict，其所含字段信息见表[block_info](#Table-:-block_info) |              |
-|    Extra     | 额外信息，这个字段提供给选手可以添加自定义的信息，每次发包的时候会调用选手模块中的“make_decision”函数，获取其所返回的最新Extra字段信息，填充到该包中，其可能包含字段信息见表[Extra](Table-:-Extra) |              |
+|    Extra     | 额外信息，这个字段提供给选手可以添加自定义的信息，每次发包的时候会调用选手模块中的"on_packet_sent"函数，获取其所返回的最新Extra字段信息，填充到该包中，其可能包含字段信息见表[Extra](Table-:-Extra) |              |
 
 ## Table : Extra
 

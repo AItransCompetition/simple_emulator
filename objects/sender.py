@@ -27,7 +27,7 @@ class Sender():
                                                 self.features, self.id)
 
         self.solution = solution
-        ret = check_solution_format(self.solution.make_decision(0))
+        ret = check_solution_format(self.solution.on_packet_sent(0))
         self.rate = ret["send_rate"] if "send_rate" in ret else float("inf")
         self.USE_CWND = self.solution.USE_CWND if hasattr(self.solution, "USE_CWND") else True
         # Not use this if USE_CWND=FALSE
@@ -165,11 +165,11 @@ class Sender():
     def can_send_packet(self, cur_time):
         """
         check it that can send packet now if your congestion control is based windows.
-        Firstly, we will call the funtion of "make_decision" in your solution and get rate, cwnd, extra.
+        Firstly, we will call the funtion of "on_packet_sent" in your solution and get rate, cwnd, extra.
         Then, we will update sender according to your parameters.
         :return: Boolean.
         """
-        ret = self.solution.make_decision(cur_time)
+        ret = self.solution.on_packet_sent(cur_time)
         self.rate = ret["send_rate"] if "send_rate" in ret else self.rate
         self.cwnd = ret["cwnd"] if "cwnd" in ret else self.cwnd
         self.extra = ret["extra"] if "extra" in ret else {}

@@ -24,7 +24,7 @@ class MTR(CongestionControl):
                 break
             self.send_rate = self.trace_list[i][1] * 10**6 / BYTES_PER_PACKET /2
 
-    def make_decision(self, cur_time):
+    def on_packet_sent(self, cur_time):
         self.update_trace(cur_time)
         output = {
             "send_rate" : self.send_rate
@@ -35,7 +35,7 @@ class MTR(CongestionControl):
         event_time = data["event_time"]
         self.update_trace(event_time)
 
-    def append_input(self, data):
+    def cc_trigger(self, data):
         self._input_list.append(data)
 
         if data["event_type"] != PACKET_TYPE_TEMP:

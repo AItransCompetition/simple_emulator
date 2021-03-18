@@ -9,7 +9,7 @@
 '''
 
 from objects.emulator import SimpleEmulator
-from utils import analyze_pcc_emulator, plot_cwnd, plot_rate
+from utils import analyze_emulator, plot_cwnd, plot_rate
 import os, sys, inspect, random
 from config.constant import *
 from objects.sender import Sender as WinSender
@@ -83,6 +83,6 @@ if __name__ == '__main__':
     print(emulator.senders[0].application.ack_blocks)
     from qoe_model import cal_qoe
     print(cal_qoe(0.9))
-    # analyze_pcc_emulator(log_packet_file, file_range="all")
+    # analyze_emulator(log_packet_file, file_range="all")
     # plot_cwnd(log_packet_file, trace_file=trace_file, file_range="all")
     # plot_throughput(log_packet_file, trace_file=trace_file, file_range="all")

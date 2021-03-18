@@ -7,7 +7,7 @@ class CongestionControl(object):
         self.pacing_rate = float("inf")
         self.call_nums = 0
 
-    def make_decision(self, cur_time):
+    def on_packet_sent(self, cur_time):
         """call this when sender send packet"""
         self.call_nums += 1
 
@@ -19,7 +19,7 @@ class CongestionControl(object):
 
         return output
 
-    def append_input(self, data):
+    def cc_trigger(self, data):
         self._input_list.append(data)
 
         return None

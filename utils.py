@@ -34,7 +34,7 @@ def measure_time():
     return wraps
 
 
-def analyze_pcc_emulator(log_file, trace_file=None, rows=None, time_range=None, scatter=False, file_range=None, sender=None):
+def analyze_emulator(log_file, trace_file=None, rows=None, time_range=None, scatter=False, file_range=None, sender=None):
 
     plt_data = []
     if file_range:
@@ -478,6 +478,6 @@ if __name__ == '__main__':
     log_packet_file = "output/packet_log/packet-0.log"
     trace_file = "config/trace.txt"
     new_trace_file = "scripts/first_group/traces_1.txt"
-    # analyze_pcc_emulator(log_packet_file, time_range=None, scatter=False, trace_file=new_trace_file, file_range="all")
+    # analyze_emulator(log_packet_file, time_range=None, scatter=False, trace_file=new_trace_file, file_range="all")
     # plot_cwnd(log_packet_file, None, trace_file=new_trace_file, time_range=None, scatter=False, file_range="all")
     plot_rate(log_packet_file, file_range="all", scatter=False)

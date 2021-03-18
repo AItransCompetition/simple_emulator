@@ -66,7 +66,7 @@ class Reno(CongestionControl):
             debug_print("Drop nums, Ack_nums")
             debug_print(self.drop_nums, self.ack_nums)
 
-    def append_input(self, data):
+    def cc_trigger(self, data):
         self._input_list.append(data)
 
         if data["event_type"] != PACKET_TYPE_TEMP:
