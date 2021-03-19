@@ -2,10 +2,10 @@
 
 ## For pypi
 
-We have package our repository into [Simple-Emulator](https://pypi.org/project/Simple-Emulator/),
+We have package our repository into [simple-emulator](https://pypi.org/project/simple-emulator/),
 which means that you can run order
 
-> pip install Simple-Emulator
+> pip install simple-emulator
 
 to install it.
 
@@ -26,12 +26,12 @@ class Solution(BlockSelection, CongestionControl):
 - create emulator
 
 ```python
-from simple_emulator import Emulator
+from simple_emulator import SimpleEmulator
 
 
 # Use the object you created above
 my_solution = Solution()
-emulator = Emulator(solution=my_solution)
+emulator = SimpleEmulator(solution=my_solution)
 ```
 
 - run emualtor
@@ -42,7 +42,7 @@ emulator = Emulator(solution=my_solution)
 emulator.run_for_dur()
 ```
 
-Here is an complete  [demo](https://github.com/AItransCompetition/DTP_Demo) about the using of pypi.
+Here is an complete  [demo](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples) about the using of pypi.
 
 ## For this repository
 
@@ -52,11 +52,11 @@ and "block_selection.py" files in path of "/player".
 Here we provide you some congestion control algorithm.
 By default the congestion control is "reno" and block selection algorithm is selecting block which is closest to it's deadline.
 
-Then, just run the order "python3 main.py".
+Then, just run the order "python3 run_this.py".
 
 You will get some output in the path "/output/" and should fix your code according to the output.
 
-Here is an complete  [demo](https://github.com/Azson/Simple-emulator/blob/emulator/deom_2.py) about the using of this repository.
+Here is an complete  [demo](https://github.com/AItransCompetition/Meet-Deadline-Requirements/blob/master/run_this.py) about the using of this repository.
 
 # For Detail
 
@@ -80,7 +80,7 @@ Here is the explanations of [Input](#Input) and [Output](#Output) .
 
 In this module, you have to implement the function "select_block" with the parameters "cur_time, block_queue" and return an integer value which means the block index in block queue, which will be sent at the time "cur_time".
 
-Here we provided a [example](https://github.com/Azson/Simple-emulator/blob/emulator/player/block_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
+Here we provided a [example](https://github.com/AItransCompetition/simple_emulator/blob/mmgc/player/block_selection.py) of selecting block by the **create time** firstly, and **radio of rest life time to deadline** secondly.
 
 #### select_block
 
@@ -91,7 +91,7 @@ For every block in block queue, it's implement in "objects/block.py". But we rec
 In this module, you have to implement a class with member function "on_packet_sent" and "cc_trigger". So we recommend you to accomplish this by inheriting from the object of "CongestionControl" implemented in "cc_base.py" in case you forget these. 
 
 Here we provided some simple algorithms about congestion control to help you being familiar with this competition.
-Like [Reno](https://github.com/AItransCompetition/Simple_Demo/blob/master/demo_reno.py) and an example about [reinforcement learning](https://github.com/AItransCompetition/Simple_Demo/blob/master/demo_rl.py) implemented by tensorflow.
+Like [Reno](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples/reno) and an example about [reinforcement learning](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples/rl_torch) implemented by tensorflow.
 
 #### on_packet_sent
 
@@ -164,19 +164,19 @@ We create the block by using the file "data_audio.csv" and "data_video.csv" whic
 
 For "data_audio.csv", the first columns is the created time of block and the second columns is the block size. 
 
-| 时间 (s) | 数据大小 (B) |
-| -------- | ------------ |
-| 0.0      | 514          |
-| 0.06     | 305          |
-| ...      | ...          |
+| Time (s) | Block Size (B) |
+| -------- | -------------- |
+| 0.0      | 514            |
+| 0.06     | 305            |
+| ...      | ...            |
 
 For "data_video.csv", it has the same columns like "data_audio.csv" except the third columns, which means P frame or I frame.
 
-| 时间 (s) | 数据大小 (B) | 关键帧 |
-| -------- | ------------ | ------ |
-| 0.0      | 9584         | P      |
-| 0.033    | 8069         | P      |
-| ...      | ...          | ...    |
+| Time (s) | Block_size (B) | Frame Type |
+| -------- | -------------- | ---------- |
+| 0.0      | 9584           | P          |
+| 0.033    | 8069           | P          |
+| ...      | ...            | ...        |
 
 ### Trace data
 
@@ -184,11 +184,11 @@ We use the generated trace data by using the Hidden Markov algorithm to simulate
 
 For the trace file, the first columns is the changed time of bandwidth. The second columns is the bandwidth whose unit is megabytes. And the third columns is the link random loss rate. Finally, the last columns is the fixed propagation delay of link whose unit is seconds.
 
-| 时间 (s) | 带宽 (MB)          | 丢包率 | 传播时延 (s) |
-| -------- | ------------------ | ------ | ------------ |
-| 0        | 19.38592070201254  | 0      | 0.001        |
-| 1        | 24.832955411664393 | 0      | 0.001        |
-| ...      | ...                | ...    | ...          |
+| Time (s) | Bandwidth (MB)     | Loss Rate(%) | Propagation Delay (s) |
+| -------- | ------------------ | ------------ | --------------------- |
+| 0        | 19.38592070201254  | 0            | 0.001                 |
+| 1        | 24.832955411664393 | 0            | 0.001                 |
+| ...      | ...                | ...          | ...                   |
 
 ## objects
 
@@ -318,91 +318,83 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 
 ![throughput_changing](output/throughput_changing.png)
 
-# Todo list
-
-- [x] Add BBR congestion control module.
-- [x] Add AI congestion control module.
-- [x] Add QOE mudule.
-- [x] Add system presentation PPT.
-
 # Appendix
 
 ## Input
 
-|    变量名    |                             含义                             |                       样例                        |
-| :----------: | :----------------------------------------------------------: | :-----------------------------------------------: |
-|   cur_time   |                         当前时间(s)                          |                     0.0（s）                      |
-| packet_queue | 发送端当前待发送的包队列，其每个包的字段信息见表[packet_queue](#Table-:-packet_queue) |               [packet_1, packet_2]                |
-|     data     | 由接收端传回的ACK或Lost信息，其每个包的字段信息见表[data](#Table-:-data) | [event_time, event_type, packet_information_dict] |
+|  Variable   |                         Explanation                          |                      Sample                       |
+| :---------: | :----------------------------------------------------------: | :-----------------------------------------------: |
+|  cur_time   |                       current time(s)                        |                     0.0（s）                      |
+| block_queue | The block queue currently to be sent at the sender, the field information of each packet is shown in the table [packet_queue](#Table-:-block_queue) |               [packet_1, packet_2]                |
+|    data     | For the ACK or Lost information returned by the receiving end, the field information of each packet is shown in the table [data](#Table-:-data) | [event_time, event_type, packet_information_dict] |
 
 ## Output
 
-|    变量名    |                    含义                    |     样例      |
-| :----------: | :----------------------------------------: | :-----------: |
-| packet_index | 当前时刻要发送的包在packet_queue中的索引值 |    1(int)     |
-|     Cwnd     |        发送端当前时刻的拥塞窗口大小        | 10（packet）  |
-|  Send_rate   |        发送端当前时刻的发送速率大小        | 5（packet/s） |
+|  Variable   |                         Explanation                          |    Sample     |
+| :---------: | :----------------------------------------------------------: | :-----------: |
+| block_index | The index value of the block to be sent at the current moment in block_queue |    1(int)     |
+|    Cwnd     |       The current congestion window size of the sender       | 10（packet）  |
+|  Send_rate  |     The sending rate of the sender at the current moment     | 5（packet/s） |
 
 ## Table : block_queue
 
-|   变量名    |                             含义                             |     样例      |
+|  Variable   |                         Explanation                          |    Sample     |
 | :---------: | :----------------------------------------------------------: | :-----------: |
-| packet_type |      包类型，分'S'和'A'两种，分别表示发送过程和确认过程      |   A（str）    |
-| create_time |                        该包的创建时间                        |   0.1（s）    |
-|   offset    |                  该包在其所属Block中的偏移                   |   1（int）    |
-|  packet_id  |                      该包的ID，全局唯一                      |   1（int）    |
-|   payload   |             该包实际有效的Block数据大小（Bytes）             | 1480（Bytes） |
-| packet_size |                     该包实际大小(Bytes)                      | 1500（Bytes） |
-| block_info  | 该包所属Block的信息，类型为dict，其所含字段信息见表[block_info](#Table-:-block_info) |   0.0（s）    |
+| packet_type | Packet type, divided into two types,'S' and'A', which respectively represent the sending process and the confirming process |   A（str）    |
+| create_time |             The time when the packet was created             |   0.1（s）    |
+|   offset    |  The offset of the packet in the block to which it belongs   |   1（int）    |
+|  packet_id  |              ID of the packet, globally unique               |   1（int）    |
+|   payload   | The actual effective data size of the packet in block（Bytes） | 1480（Bytes） |
+| packet_size |             The actual size of the packet(Bytes)             | 1500（Bytes） |
+| block_info  | The information of the block to which the packet belongs, the type is dict, and the field information contained in it is shown in the table [block_info](#Table-:-block_info) |   0.0（s）    |
 
 ## Table : block_info
 
-|   变量名    |            含义            |      样例       |
-| :---------: | :------------------------: | :-------------: |
-|  Block_id   |    Block的ID，全局唯一     |    1（int）     |
-|  Priority   | Block的优先级，取值0、1和2 |    1（int）     |
-|  Deadline   |    Block的过期时间大小     |    0.2（s）     |
-| Create_time |      Block的创建时刻       |    0.1（s）     |
-|    Size     |     Block的大小(Bytes)     | 200000（Bytes） |
+|  Variable   |                      Explanation                      |     Sample      |
+| :---------: | :---------------------------------------------------: | :-------------: |
+|  Block_id   |               Block ID, globally unique               |    1（int）     |
+|  Priority   | The priority of the block, the values are 0, 1, and 2 |    1（int）     |
+|  Deadline   |              Block expiration time size               |    0.2（s）     |
+| Create_time |          The time when the block was created          |    0.1（s）     |
+|    Size     |                   Block size(Bytes)                   | 200000（Bytes） |
 
 ## Table : data
 
-|         变量名          |                             含义                             |   样例   |
+|        Variable         |                         Explanation                          |  Sample  |
 | :---------------------: | :----------------------------------------------------------: | :------: |
-|       event_time        |                         当前时间(s)                          | 0.1（s） |
-|       event_type        | 该包的事件类型，取值可为F、D和T，分别表示完成包、丢弃包和中间状态包（即除前2种外的包） | F（str） |
-| packet_information_dict | 该包的简要信息组成的字典，其每个包的字段信息见表[packet_information_dict](#Table-:-packet_information_dict) |          |
+|       event_time        |                       Current time(s)                        | 0.1（s） |
+|       event_type        | The event type of the packet, the values can be F, D, and T, which represent completed packets, dropped packets, and intermediate state packets (that is, packets other than the first two types) | F（str） |
+| packet_information_dict | A dictionary composed of the brief information of the packet, the field information of each packet is shown in the table [packet_information_dict](#Table-:-packet_information_dict) |          |
 
 ## Table : packet_information_dict
 
-|    变量名    |                             含义                             |     样例     |
+|    Variable    |                             Explanation                             |     Sample     |
 | :----------: | :----------------------------------------------------------: | :----------: |
-|     Type     |      包类型，分'S'和'A'两种，分别表示发送过程和确认过程      |   S（str）   |
-|   Position   |               该包所处位置，当其在发送端时为0                |   0（int）   |
-|  Send_delay  |                           发送时延                           |   0.1（s）   |
-| Pacing_delay |        Pacing时延，如BBR之类的拥塞算法会使用到的概念         |   0.0（s）   |
-|   Latency   | 该包在链路中所花费的时延，包括所有已经过的跳的排队时延和链路的传播时延 |   0.2（s）   |
-|     Drop     |                该包是否是一个表示丢弃信息的包                |   0（int)    |
-|  Packet_id   |                      该包的ID，全局唯一                      |  100（int）  |
-| Create_time  |                        该包的创建时间                        |   0.0（s）   |
-|    Offset    |                  该包在其所属Block中的偏移                   |   0（int）   |
-|   Payload    |              该包实际有效的Block数据大小(Bytes)              | 1480（Byte） |
-| Packet_size  |                     该包实际大小(Bytes)                      | 1500（Byte） |
-|  Block_info  | 该包所属Block的信息，类型为dict，其所含字段信息见表[block_info](#Table-:-block_info) |              |
-|    Extra     | 额外信息，这个字段提供给选手可以添加自定义的信息，每次发包的时候会调用选手模块中的"on_packet_sent"函数，获取其所返回的最新Extra字段信息，填充到该包中，其可能包含字段信息见表[Extra](Table-:-Extra) |              |
+|     Type     |      Packet type, divided into two types,'S' and'A', which respectively represent the sending process and the confirming process      |   S（str）   |
+|   Position   | The location of the packet, when it is at the sending end, it is 0 |   0（int）   |
+|  Send_delay  |                           Send delay                           |   0.1（s）   |
+|   Latency   | The delay spent by the packet on the link, including the queuing delay of all hops that have passed and the propagation delay of the link |   0.2（s）   |
+|     Drop     |                Whether the packet is a packet indicating discarded information                |   0（int)    |
+|  Packet_id   |                      ID of the packet, globally unique                      |  100（int）  |
+| Create_time  |                        The time when the packet was created                        |   0.0（s）   |
+|    Offset    | The offset of the packet in the block to which it belongs |   0（int）   |
+|   Payload    |              The actual effective data size of the packet in block(Bytes)              | 1480（Byte） |
+| Packet_size  |             The actual size of the packet(Bytes) | 1500（Byte） |
+|  Block_info  | The information of the block to which the packet belongs, the type is dict, and the field information contained in it is shown in the table [block_info](#Table-:-block_info) |              |
+|    Extra     | Additional information. This field provides players with customized information. Each time a packet is sent, the "on_packet_sent" function in the player module will be called to obtain the latest Extra field information returned by it. Fill in the packet, which may contain See the table for field information [Extra](Table-:-Extra) |              |
 
 ## Table : Extra
 
-|  变量名   |                             含义                             |     样例      |
+| Variable |                             Explanation                             |    Sample |
 | :-------: | :----------------------------------------------------------: | :-----------: |
-|   Cwnd    | 发送端当前时刻的拥塞窗口大小，单位为包，当且仅当使用拥塞窗口时才有效 |  5 (packet)   |
-| Send_rate | 发送端当前时刻的发送速率大小，单位为包/s，当前仅当选手使用rate-based拥塞算法有效 | 10 (packet/s) |
-| inflight | 当前时刻发送端已发送但未收到ack或lost信息的包的数量 | 10 (packet) |
+|   Cwnd    | The size of the congestion window of the sender at the current moment, the unit is a packet, which is valid only when the congestion window is used |  5 (packet)   |
+| Send_rate | The sending rate of the sender at the current moment, the unit is packet/s, currently only valid when the player uses the rate-based congestion algorithm | 10 (packet/s) |
+| inflight | The number of packets that have been sent by the sender but have not received ack or lost information at the current moment | 10 (packet) |
 
 ## Table : QOE_parameters
 
-|   指标   |            含义            | 样例    |
-| :------: | :------------------------: | ------- |
-| Priority | block的优先级，取值0、1和2 | 0 (int) |
-| Miss_ddl |   block是否miss deadline   | 1 (int) |
+| Variable |                      Explanation                      | Sample  |
+| :------: | :---------------------------------------------------: | :-----: |
+| Priority | The priority of the block, the values are 0, 1, and 2 | 0 (int) |
+| Miss_ddl |            whether the block miss deadline            | 1 (int) |
 
