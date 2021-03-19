@@ -340,13 +340,13 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 
 |  Variable   |                         Explanation                          |    Sample     |
 | :---------: | :----------------------------------------------------------: | :-----------: |
-| packet_type | Packet type, divided into two types,'S' and'A', which respectively represent the sending process and the confirming process |   A（str）    |
 | create_time |             The time when the packet was created             |   0.1（s）    |
 |   offset    |  The offset of the packet in the block to which it belongs   |   1（int）    |
 |  packet_id  |              ID of the packet, globally unique               |   1（int）    |
 |   payload   | The actual effective data size of the packet in block（Bytes） | 1480（Bytes） |
 | packet_size |             The actual size of the packet(Bytes)             | 1500（Bytes） |
 | block_info  | The information of the block to which the packet belongs, the type is dict, and the field information contained in it is shown in the table [block_info](#Table-:-block_info) |   0.0（s）    |
+|   retrans   |   Indicates whether the packet is a retransmission packet    | False (Bool)  |
 
 ## Table : block_info
 
@@ -357,6 +357,7 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 |  Deadline   |              Block expiration time size               |    0.2（s）     |
 | Create_time |          The time when the block was created          |    0.1（s）     |
 |    Size     |                   Block size(Bytes)                   | 200000（Bytes） |
+| Split_nums  |   The number of packets that the block is splitter    |     5 (int)     |
 
 ## Table : data
 
@@ -370,8 +371,6 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 
 |    Variable    |                             Explanation                             |     Sample     |
 | :----------: | :----------------------------------------------------------: | :----------: |
-|     Type     |      Packet type, divided into two types,'S' and'A', which respectively represent the sending process and the confirming process      |   S（str）   |
-|   Position   | The location of the packet, when it is at the sending end, it is 0 |   0（int）   |
 |  Send_delay  |                           Send delay                           |   0.1（s）   |
 |   Latency   | The delay spent by the packet on the link, including the queuing delay of all hops that have passed and the propagation delay of the link |   0.2（s）   |
 |     Drop     |                Whether the packet is a packet indicating discarded information                |   0（int)    |

@@ -12,8 +12,6 @@ sys.path.insert(0, parentdir)
 
 import json, shutil
 
-from player.aitrans_solution import Solution as s1
-
 
 def cal_qoe(x=0.9, run_dir=None):
     block_data = []
