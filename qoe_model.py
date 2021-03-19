@@ -15,13 +15,18 @@ import json, shutil
 from player.aitrans_solution import Solution as s1
 
 
-def cal_qoe(x=0.9):
+def cal_qoe(x=0.9, run_dir=None):
     block_data = []
     urgency = []
     priorities = []
     qoe = 0
     tmp = [3, 2, 1]
-    with open("output/block.log", "r") as f:
+    if run_dir:
+        if run_dir[-1] != '/':
+            run_dir += '/'
+    else:
+        run_dir = './'
+    with open(run_dir + "output/block.log", "r") as f:
         for line in f.readlines():
             data = json.loads(line.replace("'", '"'))
             # not finished
