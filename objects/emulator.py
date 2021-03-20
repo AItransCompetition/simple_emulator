@@ -85,7 +85,7 @@ class SimpleEmulator(object):
                         os.system("rmdir /Q /S \"" + extra["RUN_DIR"] + "/output\"")
                     else:
                         # for linux
-                        os.system("rm -rf \"" + extra["RUN_DIR"] + "/output")
+                        os.system("rm -rf \"" + extra["RUN_DIR"] + "/output\"")
                 os.mkdir(extra["RUN_DIR"] + "/output")
                 os.mkdir(extra["RUN_DIR"] + "/output/packet_log")
             except Exception as e:

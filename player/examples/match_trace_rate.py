@@ -29,17 +29,13 @@ class MTR(CongestionControl):
         output = {
             "send_rate" : self.send_rate
         }
-        return output
+        return output        
 
-    def cc_trigger(self, data):
-        event_time = data["event_time"]
-        self.update_trace(event_time)
+    def cc_trigger(self, cur_time, event_info):
+        self._input_list.append([cur_time, event_info])
 
-    def cc_trigger(self, data):
-        self._input_list.append(data)
-
-        if data["event_type"] != PACKET_TYPE_TEMP:
-            self.cc_trigger(data)
+        if event_info["event_type"] != PACKET_TYPE_TEMP:
+            self.update_trace(cur_time)
             return {
                 "send_rate" : self.send_rate
             }

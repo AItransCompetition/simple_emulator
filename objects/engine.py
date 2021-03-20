@@ -217,19 +217,18 @@ class Engine():
         if sender.id != self.senders[0].id:
             return
         if event_type == "packet":
-            data = {
-                "event_time" : event_time,
+            event_info = {
                 "event_type" : get_packet_type(sender, packet),
                 "packet_information_dict" : packet.trans2dict()
             }
-            data["packet_information_dict"]["Extra"]["inflight"] = sender.get_waiting_ack_nums()
+            event_info["packet_information_dict"]["Extra"]["inflight"] = sender.get_waiting_ack_nums()
         # todo : how to design system information
         elif event_type == "system":
-            data = {
+            event_info = {
 
             }
 
-        feed_back = sender.solution.cc_trigger(data)
+        feed_back = sender.solution.cc_trigger(event_time, event_info)
         # clear memory from solution._input_list
         if hasattr(sender.solution, "_input_list") and len(sender.solution._input_list) > 10000:
             sender.solution._input_list = sender.solution._input_list[5000:]

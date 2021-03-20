@@ -106,25 +106,27 @@ For the member function "on_packet_sent", we will call it every time I want to s
 
 #### cc_trigger
 
-For every item information in "_input_list",  it is a triad of **(event_time, event_type, and packet_information_dict)**. 
+For every item information in "_input_list",  it is a two-tuple of **(cur_time, event_info)**. 
 
-- event_time
+- cur_time
 
   > The time when the packet arrived.
 
-- event_type
+- event_info
 
-  > We divide the packet into three categories : PACKET_TYPE_FINISHED, PACKET_TYPE_TEMP, PACKET_TYPE_DROP.
-  >
-  > PACKET_TYPE_FINISHED : The acknowledge packet that successfully reached the source point;
-  >
-  > PACKET_TYPE_TEMP : The packet that have not yet reached the source point;
-  >
-  > PACKET_TYPE_DROP : The packet used to inform the source point of packet loss.
+  - event_type
 
-- packet_information_dict
+    > We divide the packet into three categories : PACKET_TYPE_FINISHED, PACKET_TYPE_TEMP, PACKET_TYPE_DROP.
+    >
+    > PACKET_TYPE_FINISHED : The acknowledge packet that successfully reached the source point;
+    >
+    > PACKET_TYPE_TEMP : The packet that have not yet reached the source point;
+    >
+    > PACKET_TYPE_DROP : The packet used to inform the source point of packet loss.
 
-  > The packet it the object implemented in "objects/packet.py". But we recommend you to get more information at [Packet](#packet-log) .
+  - packet_information_dict
+
+    > The packet it the object implemented in "objects/packet.py". But we recommend you to get more information at [Packet](#packet-log) .
 
 Why we design a individual function to add element to "_input_list"?
 
@@ -326,7 +328,7 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 | :---------: | :----------------------------------------------------------: | :-----------------------------------------------: |
 |  cur_time   |                       current time(s)                        |                     0.0（s）                      |
 | block_queue | The block queue currently to be sent at the sender, the field information of each packet is shown in the table [packet_queue](#Table-:-block_queue) |               [packet_1, packet_2]                |
-|    data     | For the ACK or Lost information returned by the receiving end, the field information of each packet is shown in the table [data](#Table-:-data) | [event_time, event_type, packet_information_dict] |
+|    event_info     | For the ACK or Lost information returned by the receiving end, the field information of each packet is shown in the table [event_info](#Table-:-event_info) | [event_type, packet_information_dict] |
 
 ## Output
 
@@ -359,11 +361,10 @@ We put the draw function in the "analyze_emulator" of "utils.py". You also can d
 |    Size     |                   Block size(Bytes)                   | 200000（Bytes） |
 | Split_nums  |   The number of packets that the block is splitter    |     5 (int)     |
 
-## Table : data
+## Table : event_info
 
 |        Variable         |                         Explanation                          |  Sample  |
 | :---------------------: | :----------------------------------------------------------: | :------: |
-|       event_time        |                       Current time(s)                        | 0.1（s） |
 |       event_type        | The event type of the packet, the values can be F, D, and T, which represent completed packets, dropped packets, and intermediate state packets (that is, packets other than the first two types) | F（str） |
 | packet_information_dict | A dictionary composed of the brief information of the packet, the field information of each packet is shown in the table [packet_information_dict](#Table-:-packet_information_dict) |          |
 

@@ -19,7 +19,7 @@ class CongestionControl(object):
 
         return output
 
-    def cc_trigger(self, data):
-        self._input_list.append(data)
+    def cc_trigger(self, cur_time, event_info):
+        self._input_list.append([cur_time, event_info])
 
         return None

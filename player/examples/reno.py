@@ -17,9 +17,10 @@ class Reno(CongestionControl):
         self.last_cwnd = 0
         self.instant_drop_nums = 0
 
-    def cc_trigger(self, data):
-        packet_type = data["event_type"]
-        event_time = data["event_time"]
+    def cc_trigger(self, cur_time, event_info):
+        self._input_list.append([cur_time, cur_time])
+        packet_type = event_info["event_type"]
+        event_time = cur_time
 
         if self.cur_time < event_time:
             self.last_cwnd = 0
@@ -65,15 +66,9 @@ class Reno(CongestionControl):
         if self.drop_nums == 0:
             debug_print("Drop nums, Ack_nums")
             debug_print(self.drop_nums, self.ack_nums)
-
-    def cc_trigger(self, data):
-        self._input_list.append(data)
-
-        if data["event_type"] != PACKET_TYPE_TEMP:
-            self.cc_trigger(data)
-            return {
+        
+        return {
                 "cwnd" : self.cwnd,
                 "send_rate" : self.send_rate
             }
-        return None
 
