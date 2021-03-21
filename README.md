@@ -148,7 +148,7 @@ Here are some constants that may be help for you：
 
 - USE_CWND
 
-  > Set "False" if your congestion control algorithm don't use cwnd.
+  > Set "True" if your congestion control algorithm use cwnd.
 
 - ENABLE_LOG
 

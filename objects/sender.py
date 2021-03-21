@@ -29,7 +29,7 @@ class Sender():
         self.solution = solution
         ret = check_solution_format(self.solution.on_packet_sent(0))
         self.rate = ret["send_rate"] if "send_rate" in ret else float("inf")
-        self.USE_CWND = self.solution.USE_CWND if hasattr(self.solution, "USE_CWND") else True
+        self.USE_CWND = self.solution.USE_CWND if hasattr(self.solution, "USE_CWND") else False
         # Not use this if USE_CWND=FALSE
         self.cwnd = ret["cwnd"] if "cwnd" in ret else 25
         self.starting_rate = self.rate

@@ -7,6 +7,7 @@ class Reno(CongestionControl):
 
     def __init__(self):
         super(Reno, self).__init__()
+        self.USE_CWND = True
         self.ssthresh = float("inf")
         self.curr_state = "slow_start"
         self.states = ["slow_start", "congestion_avoidance", "fast_recovery"]

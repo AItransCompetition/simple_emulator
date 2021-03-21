@@ -6,6 +6,7 @@ class CongestionControl(object):
         self.send_rate = float("inf")
         self.pacing_rate = float("inf")
         self.call_nums = 0
+        self.USE_CWND = False
 
     def on_packet_sent(self, cur_time):
         """call this when sender send packet"""
