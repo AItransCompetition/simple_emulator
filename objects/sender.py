@@ -172,6 +172,7 @@ class Sender():
         ret = self.solution.on_packet_sent(cur_time)
         self.rate = ret["send_rate"] if "send_rate" in ret else self.rate
         self.cwnd = ret["cwnd"] if "cwnd" in ret else self.cwnd
+        self.pacing_rate = ret["pacing_rate"] if "pacing_rate" in ret else self.pacing_rate
         self.extra = ret["extra"] if "extra" in ret else {}
         if self.USE_CWND:
             return int(self.bytes_in_flight) / BYTES_PER_PACKET < self.cwnd
