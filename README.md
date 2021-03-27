@@ -42,7 +42,7 @@ emulator = SimpleEmulator(solution=my_solution)
 emulator.run_for_dur()
 ```
 
-Here is an complete  [demo](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples) about the using of pypi.
+Here is an complete  [demo](https://github.com/AItransCompetition/Meet-Deadline-Requirements-Challenge/tree/master/solution_examples) about the using of pypi.
 
 ## For this repository
 
@@ -56,7 +56,7 @@ Then, just run the order "python3 run_this.py".
 
 You will get some output in the path "/output/" and should fix your code according to the output.
 
-Here is an complete  [demo](https://github.com/AItransCompetition/Meet-Deadline-Requirements/blob/master/run_this.py) about the using of this repository.
+Here is an complete  [demo](https://github.com/AItransCompetition/Meet-Deadline-Requirements-Challenge/blob/master/run_this.py) about the using of this repository.
 
 # For Detail
 
@@ -91,7 +91,7 @@ For every block in block queue, it's implement in "objects/block.py". But we rec
 In this module, you have to implement a class with member function "on_packet_sent" and "cc_trigger". So we recommend you to accomplish this by inheriting from the object of "CongestionControl" implemented in "cc_base.py" in case you forget these. 
 
 Here we provided some simple algorithms about congestion control to help you being familiar with this competition.
-Like [Reno](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples/reno) and an example about [reinforcement learning](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples/rl_torch) implemented by tensorflow.
+Like [Reno](https://github.com/AItransCompetition/Meet-Deadline-Requirements/tree/master/solution_examples/reno) and an example about [reinforcement learning](https://github.com/AItransCompetition/Meet-Deadline-Requirements-Challenge/tree/master/solution_examples/rl_torch) implemented by tensorflow.
 
 #### on_packet_sent
 

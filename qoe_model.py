@@ -28,10 +28,10 @@ def cal_qoe(x=0, run_dir=None):
                 continue
             block_data.append(data)
     for block in block_data:        
+        priority = float(tmp[int(block['Priority'])] / 3)
         if block["Miss_ddl"] == 0:
-            priority = float(tmp[int(block['Priority'])] / 3)
             qoe += priority
-        else:
+        elif abs(x) > 0.00001:
             qoe -= x*priority
     return qoe
 
