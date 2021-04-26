@@ -90,8 +90,8 @@ class Engine():
                 else:
                     new_next_hop = next_hop + 1
                     link_latency = sender.path[next_hop].get_cur_latency(self.cur_time)
-                    if USE_LATENCY_NOISE:
-                        link_latency *= random.uniform(1.0, MAX_LATENCY_NOISE)
+                    if constant.USE_LATENCY_NOISE:
+                        link_latency *= random.uniform(1.0, constant.MAX_LATENCY_NOISE)
                     new_latency += link_latency
                     new_event_time += link_latency
                     push_new_event = True
@@ -123,8 +123,8 @@ class Engine():
                     new_event_type = EVENT_TYPE_ACK
                 new_next_hop = next_hop + 1
                 link_latency = sender.path[next_hop].get_cur_latency(new_event_time)
-                if USE_LATENCY_NOISE:
-                    link_latency *= random.uniform(1.0, MAX_LATENCY_NOISE)
+                if constant.USE_LATENCY_NOISE:
+                    link_latency *= random.uniform(1.0, constant.MAX_LATENCY_NOISE)
                 new_latency += link_latency
                 new_dropped = not sender.path[next_hop].packet_enters_link(new_event_time)
                 new_event_time += link_latency

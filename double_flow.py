@@ -36,6 +36,10 @@ class NormalSolution(MTR, BlockSelection):
     pass
 
 
+class DirectSendSolution(CongestionControl, BlockSelection):
+    pass
+
+
 def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
     emulator = SimpleEmulator(
         block_file=block_file,
@@ -58,6 +62,31 @@ def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
     # sender_2.init_application(emulator.block_file, ENABLE_BLOCK_LOG=False)
 
     emulator.senders = [sender_1, sender_2]
+    emulator.net = Engine(emulator.senders, emulator.links)
+
+    return emulator
+
+
+def create_multi_service_emulator(solution_list, sender_block_file_list, trace_file, **kwargs):
+    emulator = SimpleEmulator(
+        block_file=sender_block_file_list[0],
+        trace_file=trace_file,
+        senders=[],
+        links=[],
+        **kwargs
+    )
+    emulator.trace_list = emulator.get_trace()
+    queue = int(random.uniform(*emulator.queue_range))
+    emulator.links = [Link(emulator.trace_list, queue), Link([], queue)]
+
+    senders = []
+    for idx, solution in enumerate(solution_list):
+        solution = solution if solution else DirectSendSolution()
+        sender = WinSender(emulator.links, 0, emulator.features, history_len=emulator.history_len, solution=solution)
+        sender.init_application(sender_block_file_list[idx])
+        senders.append(sender)
+
+    emulator.senders = senders
     emulator.net = Engine(emulator.senders, emulator.links)
 
     return emulator

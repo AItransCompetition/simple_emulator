@@ -1,4 +1,4 @@
-import json, random, os, inspect
+import json, random, os, inspect, shutil
 import numpy as np
 
 from utils import (
@@ -75,22 +75,20 @@ class SimpleEmulator(object):
             constant.MAX_QUEUE = extra["MAX_QUEUE"]
         if "SEED" in extra:
             random.seed(extra["SEED"])
-        if "RUN_DIR" in extra:
-            self.extra["RUN_DIR"] = extra["RUN_DIR"]
-            import platform
-            try:
-                if os.path.exists(extra["RUN_DIR"] + "/output"):
-                    if platform.system() == "Windows":
-                        # for windows
-                        os.system("rmdir /Q /S \"" + extra["RUN_DIR"] + "/output\"")
-                    else:
-                        # for linux
-                        os.system("rm -rf \"" + extra["RUN_DIR"] + "/output\"")
-                os.mkdir(extra["RUN_DIR"] + "/output")
-                os.mkdir(extra["RUN_DIR"] + "/output/packet_log")
-            except Exception as e:
-                # print(extra["RUN_DIR"] + "/output")
-                pass
+        if "USE_LATENCY_NOISE" in extra:
+            constant.USE_LATENCY_NOISE = extra["USE_LATENCY_NOISE"]
+        if "MAX_LATENCY_NOISE" in extra:
+            constant.MAX_LATENCY_NOISE = extra["MAX_LATENCY_NOISE"]
+        # init output directory
+        self.extra["RUN_DIR"] = extra["RUN_DIR"] if "RUN_DIR" in extra else "."
+        try:
+            if os.path.exists(self.extra["RUN_DIR"] + "/output"):
+                shutil.rmtree(self.extra["RUN_DIR"] + "/output")
+            os.mkdir(self.extra["RUN_DIR"] + "/output")
+            os.mkdir(self.extra["RUN_DIR"] + "/output/packet_log")
+        except Exception as e:
+            # print(extra["RUN_DIR"] + "/output")
+            pass
 
     def get_trace(self):
         """init the "trace_list" according to the trace file."""
