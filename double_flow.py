@@ -36,6 +36,7 @@ class NormalSolution(MTR, BlockSelection):
     pass
 
 
+# send block if exists
 class DirectSendSolution(CongestionControl, BlockSelection):
     pass
 
@@ -68,6 +69,7 @@ def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
 
 
 def create_multi_service_emulator(solution_list, sender_block_file_list, trace_file, **kwargs):
+    # create normal emulator
     emulator = SimpleEmulator(
         block_file=sender_block_file_list[0],
         trace_file=trace_file,
@@ -75,10 +77,12 @@ def create_multi_service_emulator(solution_list, sender_block_file_list, trace_f
         links=[],
         **kwargs
     )
+    # reset links of emulator
     emulator.trace_list = emulator.get_trace()
     queue = int(random.uniform(*emulator.queue_range))
     emulator.links = [Link(emulator.trace_list, queue), Link([], queue)]
 
+    # reset senders of emulator
     senders = []
     for idx, solution in enumerate(solution_list):
         solution = solution if solution else DirectSendSolution()
@@ -87,7 +91,19 @@ def create_multi_service_emulator(solution_list, sender_block_file_list, trace_f
         senders.append(sender)
 
     emulator.senders = senders
+    # reset net of emulator
     emulator.net = Engine(emulator.senders, emulator.links)
+
+    return emulator
+
+
+def mmgc_compete_emulator(solution, first_block_file, second_block_file, trace_file=None, **kwargs):
+    emulator = create_multi_service_emulator(
+        solution_list=[solution, None],
+        sender_block_file_list=[first_block_file, second_block_file],
+        trace_file=trace_file,
+        **kwargs
+    )
 
     return emulator
 
