@@ -34,7 +34,7 @@ class AppicationLayer(object):
         self.blocks_status = dict()
 
     def update_config(self, extra):
-        self.extra["ENABLE_BLOCK_LOG"] = extra["ENABLE_BLOG_LOG"] if "ENABLE_BLOCK_LOG" in extra else True
+        self.extra["ENABLE_BLOCK_LOG"] = extra["ENABLE_BLOCK_LOG"] if "ENABLE_BLOCK_LOG" in extra else True
         self.run_dir = extra["RUN_DIR"]+'/' if "RUN_DIR" in extra else ''
 
     def handle_block(self, block_file):
