@@ -109,6 +109,19 @@ def create_mmgc_compete_emulator(solution, first_block_file, second_block_file, 
     return emulator
 
 
+def create_emulator(solution, block_file, trace_file, second_block_file=None, **kwargs):
+    if second_block_file:
+        return create_mmgc_compete_emulator(solution, first_block_file=block_file, \
+                    second_block_file=second_block_file, trace_file=trace_file, **kwargs)
+    else:
+        return SimpleEmulator(
+                block_file=block_file,
+                trace_file=trace_file,
+                solution=solution,
+                **kwargs
+            )
+
+
 if __name__ == '__main__':
 
     block_file = "config/block.txt"
