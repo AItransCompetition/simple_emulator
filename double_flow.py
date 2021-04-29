@@ -98,7 +98,7 @@ def create_multi_service_emulator(solution_list, sender_block_file_list, trace_f
     return emulator
 
 
-def mmgc_compete_emulator(solution, first_block_file, second_block_file, trace_file=None, **kwargs):
+def create_mmgc_compete_emulator(solution, first_block_file, second_block_file, trace_file=None, **kwargs):
     emulator = create_multi_service_emulator(
         solution_list=[solution, None],
         sender_block_file_list=[first_block_file, second_block_file],

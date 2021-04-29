@@ -14,12 +14,12 @@ from config.constant import *
 from config import constant
 
 from player.examples.reno import Reno
-from double_flow import create_2flow_emulator, create_multi_service_emulator, mmgc_compete_emulator
+from double_flow import create_2flow_emulator, create_multi_service_emulator, create_mmgc_compete_emulator
 from qoe_model import cal_qoe
 
 
 __all__ = ["SimpleEmulator", "CongestionControl", "BlockSelection", \
            "analyze_emulator", "plot_cwnd", "plot_rate", \
            "Reno", "create_2flow_emulator", "constant", \
-           "create_multi_service_emulator", "mmgc_compete_emulator"\
+           "create_multi_service_emulator", "create_mmgc_compete_emulator"\
            "cal_qoe"]
