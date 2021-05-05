@@ -55,7 +55,7 @@ def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
 
     solution_1 = solution
     sender_1 = WinSender(emulator.links, 0, emulator.features, history_len=emulator.history_len, solution=solution_1)
-    sender_1.init_application(emulator.block_file)
+    sender_1.init_application(emulator.block_file, **kwargs)
 
     solution_2 = NormalSolution()
     solution_2.init_trace(emulator.trace_file)
@@ -63,7 +63,7 @@ def create_2flow_emulator(solution, block_file=None, trace_file=None, **kwargs):
     # sender_2.init_application(emulator.block_file, ENABLE_BLOCK_LOG=False)
 
     emulator.senders = [sender_1, sender_2]
-    emulator.net = Engine(emulator.senders, emulator.links)
+    emulator.net = Engine(emulator.senders, emulator.links, **kwargs)
 
     return emulator
 
@@ -88,12 +88,12 @@ def create_multi_service_emulator(solution_list, sender_block_file_list, trace_f
         solution = solution if solution else DirectSendSolution()
         sender = WinSender(emulator.links, 0, emulator.features, history_len=emulator.history_len, solution=solution)
         ENABLE_BLOCK_LOG = True if idx == 0 else False
-        sender.init_application(sender_block_file_list[idx], ENABLE_BLOCK_LOG=ENABLE_BLOCK_LOG)
+        sender.init_application(sender_block_file_list[idx], ENABLE_BLOCK_LOG=ENABLE_BLOCK_LOG, **kwargs)
         senders.append(sender)
 
     emulator.senders = senders
     # reset net of emulator
-    emulator.net = Engine(emulator.senders, emulator.links)
+    emulator.net = Engine(emulator.senders, emulator.links, **kwargs)
 
     return emulator
 
