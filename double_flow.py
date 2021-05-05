@@ -80,7 +80,7 @@ def create_multi_service_emulator(solution_list, sender_block_file_list, trace_f
     # reset links of emulator
     emulator.trace_list = emulator.get_trace()
     queue = int(random.uniform(*emulator.queue_range))
-    emulator.links = [Link(emulator.trace_list, queue), Link([], queue)]
+    emulator.links = [Link(emulator.trace_list, queue), Link([], queue, delay=emulator.trace_list[0][3])]
 
     # reset senders of emulator
     senders = []
