@@ -34,7 +34,7 @@ def measure_time():
     return wraps
 
 
-def analyze_emulator(log_file, trace_file=None, rows=None, time_range=None, scatter=False, file_range=None, sender=None):
+def analyze_emulator(log_file, trace_file=None, rows=None, time_range=None, scatter=False, file_range=None, sender=None, output="output/emulator-analysis.png"):
 
     plt_data = []
     if file_range:
@@ -107,7 +107,7 @@ def analyze_emulator(log_file, trace_file=None, rows=None, time_range=None, scat
 
     plt.tight_layout()
     plt.legend(fontsize=font_size)
-    plt.savefig("output/emulator-analysis.png")
+    plt.savefig(output)
 
 
 def check_solution_format(input):
@@ -186,7 +186,7 @@ def compose_packet_logs(file_range, pattern=None):
         return compose_data
 
 
-def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None):
+def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None, output="output/cwnd_changing.png"):
     if not constant.USE_CWND:
         print("Your congestion control don't use windows~")
         return
@@ -250,7 +250,7 @@ def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
         labels.extend(tmp_ax.get_legend_handles_labels()[1])
 
     plt.legend(handles, labels, fontsize=font_size)
-    plt.savefig("output/cwnd_changing.png")
+    plt.savefig(output)
 
 
 def plot_trace(data_time, ax, font_size, tick_size, trace_file):
@@ -288,7 +288,7 @@ def plot_trace(data_time, ax, font_size, tick_size, trace_file):
     return ax
 
 
-def plot_send_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None):
+def plot_send_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None, output="output/send_rate_changing.png"):
     plt_data = []
     if file_range:
         plt_data = compose_packet_logs(file_range)
@@ -345,10 +345,10 @@ def plot_send_rate(log_file, rows=None, trace_file=None, time_range=None, scatte
         labels.extend(tmp_ax.get_legend_handles_labels()[1])
 
     plt.legend(handles, labels, fontsize=font_size)
-    plt.savefig("output/send_rate_changing.png")
+    plt.savefig(output)
 
 
-def plot_bbr(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None):
+def plot_bbr(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None, output="output/bbr_changing.png"):
     plt_data = []
     if file_range:
         plt_data = compose_packet_logs(file_range)
@@ -411,11 +411,10 @@ def plot_bbr(log_file, rows=None, trace_file=None, time_range=None, scatter=Fals
         labels.extend(tmp_ax.get_legend_handles_labels()[1])
 
     plt.legend(handles, labels, fontsize=font_size)
-    plt.savefig("output/bbr_changing.png")
-    plt.show()
+    plt.savefig(output)
 
 
-def plot_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None, size=1):
+def plot_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=False, file_range=None, sender=None, size=1, output="output/rate_changing.png"):
     plt_data = []
     if file_range:
         plt_data = compose_packet_logs(file_range)
@@ -470,14 +469,4 @@ def plot_rate(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
         labels.extend(tmp_ax.get_legend_handles_labels()[1])
 
     plt.legend(handles, labels, fontsize=font_size)
-    plt.savefig("output/rate_changing.png")
-
-
-if __name__ == '__main__':
-
-    log_packet_file = "output/packet_log/packet-0.log"
-    trace_file = "config/trace.txt"
-    new_trace_file = "scripts/first_group/traces_1.txt"
-    # analyze_emulator(log_packet_file, time_range=None, scatter=False, trace_file=new_trace_file, file_range="all")
-    # plot_cwnd(log_packet_file, None, trace_file=new_trace_file, time_range=None, scatter=False, file_range="all")
-    plot_rate(log_packet_file, file_range="all", scatter=False)
+    plt.savefig(output)

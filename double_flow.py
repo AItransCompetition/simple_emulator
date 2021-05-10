@@ -120,28 +120,3 @@ def create_emulator(solution, block_file, trace_file, second_block_file=None, **
                 solution=solution,
                 **kwargs
             )
-
-
-if __name__ == '__main__':
-
-    block_file = "config/block.txt"
-    trace_file = "config/trace.txt"
-    log_file = "output/emulator.log"
-    log_packet_file = "output/packet_log/packet-0.log"
-
-    new_trace_file = "scripts/first_group/traces_81.txt"
-    new_block_files = ["config/data_video.csv", "config/data_audio.csv"]
-
-    tmp = NormalSolution()
-    tmp.init_trace(trace_file)
-    emulator = create_2flow_emulator(RenoSolution(), block_file, trace_file, ENABLE_LOG=True)
-
-    print(emulator.run_for_dur(20))
-    emulator.dump_events_to_file(log_file)
-    emulator.print_debug()
-    print(emulator.senders[0].application.ack_blocks)
-    from qoe_model import cal_qoe
-    print(cal_qoe(0.9))
-    # analyze_emulator(log_packet_file, file_range="all")
-    # plot_cwnd(log_packet_file, trace_file=trace_file, file_range="all")
-    # plot_throughput(log_packet_file, trace_file=trace_file, file_range="all")
