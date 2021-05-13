@@ -229,6 +229,10 @@ def plot_cwnd(log_file, rows=None, trace_file=None, time_range=None, scatter=Fal
         data_time.append(item["Time"])
         data_cwnd.append(item["Extra"]["Cwnd"])
         data_Ucwnd.append(item["Waiting_for_ack_nums"])
+    # plot end point
+    if len(plt_data):
+        data_time.append(plt_data[-1]["Time"])
+        data_cwnd.append(plt_data[-1]["Extra"]["Cwnd"])
 
     pic = plt.figure(figsize=(50, 30*pic_nums))
     # plot cwnd changing
