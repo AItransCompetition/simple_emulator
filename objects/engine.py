@@ -106,15 +106,15 @@ class Engine():
                     else:
                         sender.in_event_nums -= 1
                         if sender.application:
-                            heapq.heappush(sender.wait_for_push_packets, [event_time, sender, packet])
+                            sender.wait_for_push_packets.append([event_time, packet])
                     # when do the packet create ? before or after pacing ?
                     _packet = sender.select_packet(new_event_time + (1.0 / sender.rate)) # new_packet(new_event_time + (1.0 / sender.rate))
                     if _packet:
-                        heapq.heappush(sender.wait_for_push_packets, [max(new_event_time + (1.0 / sender.rate), _packet.create_time), sender, _packet])
+                        sender.wait_for_push_packets.append([max(new_event_time + (1.0 / sender.rate), _packet.create_time), _packet])
                         if not sender.USE_CWND or int(sender.cwnd) > sender.in_event_nums:
-                            item = heapq.heappop(sender.wait_for_push_packets)
+                            item = sender.wait_for_push_packets.pop(0)
                             sender.in_event_nums += 1
-                            heapq.heappush(self.q, (max(new_event_time + (1.0 / sender.rate), item[0]), item[1], item[2]))
+                            heapq.heappush(self.q, (max(new_event_time + (1.0 / sender.rate), item[0]), sender, item[1]))
                     new_event_time += pacing_time
                 else:
                     push_new_event = True

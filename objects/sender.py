@@ -239,7 +239,7 @@ class Sender():
                 if _packet is None:
                     return ret
             else:
-                _packet = heapq.heappop(self.wait_for_push_packets)[2]
+                _packet = self.wait_for_push_packets.pop(0)[1]
             ret.append(_packet)
 
         return ret
