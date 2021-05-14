@@ -29,7 +29,6 @@ class Engine():
             sender.reset_obs()
             packet = sender.select_packet(1.0 / sender.rate) # sender.new_packet(1.0 / sender.rate)
             if packet:
-                sender.in_event_nums += 1
                 heapq.heappush(self.q, (max(1.0 / sender.rate, packet.create_time), sender, packet))
 
     def reset(self):
@@ -82,7 +81,8 @@ class Engine():
                     if sender.USE_CWND:
                         # continue ack may use same inflight numbers which will be limited to cwnd but redundancy in log
                         for _packet in sender.slide_windows(self.cur_time, sender.in_event_nums):
-                            sender.in_event_nums += 1
+                            if _packet.packet_type != "future":
+                                sender.in_event_nums += 1
                             heapq.heappush(self.q, (max(self.cur_time+(1.0 / sender.rate), _packet.create_time), \
                                                 sender, _packet))
 
@@ -109,12 +109,7 @@ class Engine():
                             sender.wait_for_push_packets.append([event_time, packet])
                     # when do the packet create ? before or after pacing ?
                     _packet = sender.select_packet(new_event_time + (1.0 / sender.rate)) # new_packet(new_event_time + (1.0 / sender.rate))
-                    if _packet:
-                        sender.wait_for_push_packets.append([max(new_event_time + (1.0 / sender.rate), _packet.create_time), _packet])
-                        if not sender.USE_CWND or int(sender.cwnd) > sender.in_event_nums:
-                            item = sender.wait_for_push_packets.pop(0)
-                            sender.in_event_nums += 1
-                            heapq.heappush(self.q, (max(new_event_time + (1.0 / sender.rate), item[0]), sender, item[1]))
+                    self.handle_next_event(new_event_time, sender, _packet)
                     new_event_time += pacing_time
                 else:
                     push_new_event = True
@@ -128,6 +123,10 @@ class Engine():
                 new_latency += link_latency
                 new_dropped = not sender.path[next_hop].packet_enters_link(new_event_time)
                 new_event_time += link_latency
+
+            if event_type == "future":
+                _packet = sender.select_packet(new_event_time)
+                self.handle_next_event(new_event_time, sender, _packet)
 
             if push_new_event:
                 packet.next_hop = new_next_hop
@@ -163,6 +162,18 @@ class Engine():
         # reward = (throughput / RATE_OBS_SCALE) * np.exp(-1 * (LATENCY_PENALTY * latency / LAT_OBS_SCALE + LOSS_PENALTY * loss))
         return reward * REWARD_SCALE
 
+    def handle_next_event(self, event_time, sender, packet):
+        if not packet:
+            return
+        if packet.packet_type == "future":
+            heapq.heappush(self.q, (max(event_time + (1.0 / sender.rate), packet.create_time), sender, packet))
+        else:
+            sender.wait_for_push_packets.append([max(event_time + (1.0 / sender.rate), packet.create_time), packet])
+            if not sender.USE_CWND or int(sender.cwnd) > sender.in_event_nums:
+                item = sender.wait_for_push_packets.pop(0)
+                sender.in_event_nums += 1
+                heapq.heappush(self.q, (max(event_time + (1.0 / sender.rate), item[0]), sender, item[1]))
+
     def get_true_log_file(self):
         """if the rows of single log file is limited to MAX_PACKET_LOG_ROWS, find the name of next new log file."""
         if isinstance(constant.MAX_PACKET_LOG_ROWS, int) and constant.MAX_PACKET_LOG_ROWS > 0:
@@ -178,7 +189,7 @@ class Engine():
         :param packet: type Packet.
         """
         # only log the first sender when ENABLE_LOG=True
-        if not constant.ENABLE_LOG:
+        if not constant.ENABLE_LOG or packet.packet_type == "future":
             return packet
 
         if constant.ENABLE_DEBUG and event_time - self.last_alert_time >= ALERT_CIRCLE:

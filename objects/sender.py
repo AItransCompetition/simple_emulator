@@ -47,6 +47,8 @@ class Sender():
         self.decision_order = 0
         # dict for packet needing to retransmission
         self.retrans_dict = dict()
+        # the packet will be select in future
+        self.wait_for_future_packets = []
 
     _next_id = 1
 
@@ -89,6 +91,10 @@ class Sender():
             if block not in block_list and len(self.retrans_dict[block]) > 0:
                 self.wait_for_select_packets.append(self.retrans_dict[block].pop(0))
 
+    def append_future_packet(self, cur_time):
+        while len(self.wait_for_future_packets) and self.wait_for_future_packets[0].create_time <= cur_time:
+            self.wait_for_select_packets.append(self.wait_for_future_packets.pop(0))
+
     # @measure_time()
     def select_packet(self, cur_time):
         """
@@ -99,20 +105,25 @@ class Sender():
         :param cur_time:
         :return:
         """
+        if self.USE_CWND and self.in_event_nums >= self.cwnd:
+            return None
         # append retrans packet which nat in selecing queue
         self.append_retrans_packet()
+        self.append_future_packet(cur_time)
         # Is it necessary ? Reduce system burden by delete the packets missing ddl in time
         self.clear_miss_ddl(cur_time)
         while True:
             # if there is no packet can be sended, we need to send packet that created after cur_time
-            packet = self.new_packet(cur_time, "force" if len(self.wait_for_select_packets) + len(self.wait_for_push_packets) == 0 else None)
+            mode = "force" if len(self.wait_for_select_packets) + len(self.wait_for_push_packets) == 0 else None
+            packet = self.new_packet(cur_time, mode)
             
             if not packet:
                 break
-            # if mode == force, update current time
-            cur_time = max(cur_time, packet.create_time)
-            
-            self.wait_for_select_packets.append(packet)
+            if mode is None:
+                self.wait_for_select_packets.append(packet)
+            elif mode == "force":
+                self.wait_for_future_packets.append(packet)
+                return packet.create_future_event(packet_size=constant.BYTES_PER_PACKET)
             # for multi flow
             if self.application is None:
                 return self.wait_for_select_packets.pop(0)
@@ -241,6 +252,9 @@ class Sender():
             else:
                 _packet = self.wait_for_push_packets.pop(0)[1]
             ret.append(_packet)
+            # for force event
+            if _packet.packet_type == "future":
+                break
 
         return ret
 

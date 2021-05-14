@@ -104,6 +104,11 @@ class Packet(object):
                       block_info=self.block_info,
                       retrans=True)
 
+    def create_future_event(self, **kwargs):
+        future_event = Packet.create_normal_packet(self.create_time, **kwargs)
+        future_event.packet_type = "future"
+        return future_event
+
     def get_hash_val(self):
         """get the hash value of this packet according to it's member variables."""
         tmp = self.trans2dict()
