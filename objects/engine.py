@@ -106,7 +106,7 @@ class Engine():
                     else:
                         sender.in_event_nums -= 1
                         if sender.application:
-                            heapq.heappush(sender.wait_for_push_packets, [event_time, sender, packet])
+                            heapq.heappush(sender.wait_for_push_packets, [event_time, packet])
                     # when do the packet create ? before or after pacing ?
                     _packet = sender.select_packet(new_event_time + (1.0 / sender.rate)) # new_packet(new_event_time + (1.0 / sender.rate))
 
